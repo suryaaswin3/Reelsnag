@@ -1,21 +1,306 @@
-index.html
+<!DOCTYPE html>
 
-<!-- KEEP EVERYTHING SAME ABOVE -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReelSnag — Instagram Reel Downloader</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: rgba(255,255,255,0.07);
+  --accent: #ff3d6b;
+  --accent2: #ff8c42;
+  --text: #f0f0f5;
+  --muted: #5a5a72;
+  --success: #3dffa0;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-x: hidden;
+}
+
+/* background blobs */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(255,61,107,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 12s ease-in-out infinite alternate;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -200px; right: -200px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,140,66,0.10) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 16s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift { from { transform: translate(0,0); } to { transform: translate(40px, 30px); } }
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  animation: fadeUp 0.6s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+  justify-content: center;
+}
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.2rem;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.03),
+              0 24px 48px rgba(0,0,0,0.5);
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.45rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+.subtitle {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 1.8rem;
+  line-height: 1.5;
+}
+
+/* Input */
+.input-wrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+.input-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap input::placeholder { color: var(--muted); }
+.input-wrap input:focus {
+  border-color: rgba(255,61,107,0.45);
+  box-shadow: 0 0 0 3px rgba(255,61,107,0.1);
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 0.95rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.btn:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Shimmer on button */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s;
+}
+.btn:not(:disabled):hover::before { left: 150%; }
+
+/* Status */
+.status {
+  margin-top: 1.2rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+.status.show { display: flex; }
+.status.loading {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.status.error {
+  background: rgba(255,61,107,0.08);
+  border: 1px solid rgba(255,61,107,0.2);
+  color: #ff7a95;
+}
+.status.success {
+  background: rgba(61,255,160,0.07);
+  border: 1px solid rgba(61,255,160,0.2);
+  color: var(--success);
+}
+
+/* Spinner */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Tips */
+.tips {
+  margin-top: 1.8rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+}
+.tips-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+.tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  color: #6a6a82;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.tip-dot {
+  width: 5px; height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+```
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon">⬇</div>
+    <span class="logo-text">ReelSnag</span>
+  </div>
+
+  <div class="card">
+    <h1>Download Instagram Reels</h1>
+    <p class="subtitle">Paste any public reel link below and download it as MP4 in seconds.</p>
+
+```
+<div class="input-wrap">
+  <input
+    id="urlInput"
+    type="url"
+    placeholder="https://www.instagram.com/reel/..."
+    autocomplete="off"
+    spellcheck="false"
+  />
+</div>
+
+<button class="btn" id="downloadBtn" onclick="handleDownload()">
+  Download Reel
+</button>
+
+<div class="status" id="status">
+  <div class="spinner" id="spinner"></div>
+  <span id="statusText"></span>
+</div>
+
+<div class="tips">
+  <p class="tips-title">Good to know</p>
+  <div class="tip"><span class="tip-dot"></span><span>Only public reels can be downloaded — private ones require login.</span></div>
+  <div class="tip"><span class="tip-dot"></span><span>Copy the full URL from your browser or the Instagram share button.</span></div>
+  <div class="tip"><span class="tip-dot"></span><span>Video downloads straight to your browser's default folder.</span></div>
+</div>
+```
+
+  </div>
+
+  <p class="footer">For personal use only · Respect creators' rights</p>
+</div>
 
 <script>
-  let adShown = false;
-
-  function triggerAdOnce() {
-    if (adShown) return;
-    adShown = true;
-
-    // 🔥 WILL REPLACE THIS AFTER YOU GET AD SCRIPT
-    console.log("Ad triggered");
-  }
-
   async function handleDownload() {
-    triggerAdOnce(); // ✅ SAFE ADD
-
     const input = document.getElementById('urlInput');
     const btn = document.getElementById('downloadBtn');
     const status = document.getElementById('status');
@@ -28,6 +313,7 @@ index.html
       return;
     }
 
+    // Disable UI
     btn.disabled = true;
     btn.textContent = 'Downloading...';
     showStatus('loading', 'Fetching your reel — hang tight...');
@@ -45,6 +331,7 @@ index.html
         return;
       }
 
+      // Trigger file download
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -73,10 +360,11 @@ index.html
     spinner.style.display = type === 'loading' ? 'block' : 'none';
   }
 
+  // Allow Enter key
   document.getElementById('urlInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleDownload();
   });
 </script>
 
-<!-- ADD THIS LATER -->
-<!-- <script src="YOUR_AD_SCRIPT.js"></script> -->
+</body>
+</html>
