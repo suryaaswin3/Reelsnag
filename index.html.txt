@@ -1,0 +1,82 @@
+index.html
+
+<!-- KEEP EVERYTHING SAME ABOVE -->
+
+<script>
+  let adShown = false;
+
+  function triggerAdOnce() {
+    if (adShown) return;
+    adShown = true;
+
+    // 🔥 WILL REPLACE THIS AFTER YOU GET AD SCRIPT
+    console.log("Ad triggered");
+  }
+
+  async function handleDownload() {
+    triggerAdOnce(); // ✅ SAFE ADD
+
+    const input = document.getElementById('urlInput');
+    const btn = document.getElementById('downloadBtn');
+    const status = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const spinner = document.getElementById('spinner');
+
+    const url = input.value.trim();
+    if (!url) {
+      showStatus('error', '✕ Please paste an Instagram Reel URL first.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Downloading...';
+    showStatus('loading', 'Fetching your reel — hang tight...');
+
+    try {
+      const res = await fetch('/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        showStatus('error', '✕ ' + (data.error || 'Something went wrong. Try again.'));
+        return;
+      }
+
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'reel.mp4';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      showStatus('success', '✓ Downloaded! Check your downloads folder.');
+      input.value = '';
+
+    } catch (err) {
+      showStatus('error', '✕ Network error. Is the server running?');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Download Reel';
+    }
+  }
+
+  function showStatus(type, msg) {
+    const status = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const spinner = document.getElementById('spinner');
+    status.className = 'status show ' + type;
+    statusText.textContent = msg;
+    spinner.style.display = type === 'loading' ? 'block' : 'none';
+  }
+
+  document.getElementById('urlInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleDownload();
+  });
+</script>
+
+<!-- ADD THIS LATER -->
+<!-- <script src="YOUR_AD_SCRIPT.js"></script> -->
