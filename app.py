@@ -1,6 +1,6 @@
 
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 import yt_dlp
 import os
 import uuid
@@ -14,7 +14,7 @@ def is_valid_instagram_url(url):
     return bool(INSTAGRAM_PATTERN.search(url))
 @app.route('/')
 def index():
-    return send_file('index.html')
+    return send_from_directory('.', 'index.html')
 
 @app.route('/download', methods=['POST'])
 def download():
