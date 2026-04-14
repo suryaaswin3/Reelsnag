@@ -12,11 +12,9 @@ INSTAGRAM_PATTERN = re.compile(r'instagram.com/(reel|p|tv)/[A-Za-z0-9_-]+')
 
 def is_valid_instagram_url(url):
     return bool(INSTAGRAM_PATTERN.search(url))
-
 @app.route('/')
 def index():
-    with open('index.html', 'r') as f:
-        return f.read()
+    return send_file('index.html')
 
 @app.route('/download', methods=['POST'])
 def download():
