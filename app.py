@@ -1,13 +1,18 @@
 from flask import Flask, request, jsonify, send_file
 import requests
-import re
 import io
+import re
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return send_file('index.html')
+
+
+def clean_url(url):
+    # Remove query params like ?igsh=...
+    return url.split("?")[0]
 
 
 @app.route('/download', methods=['POST'])
@@ -19,30 +24,39 @@ def download():
         return jsonify({'error': 'Please provide a URL.'}), 400
 
     try:
-        # 🔥 SnapInsta request (with headers to avoid blocking)
-        api_url = "https://snapinsta.app/action.php"
+        url = clean_url(url)
+
+        # 🔥 Convert to JSON endpoint
+        if "/reel/" in url:
+            shortcode = url.split("/reel/")[1].split("/")[0]
+        elif "/p/" in url:
+            shortcode = url.split("/p/")[1].split("/")[0]
+        else:
+            return jsonify({'error': 'Invalid Instagram URL'}), 400
+
+        api_url = f"https://www.instagram.com/p/{shortcode}/?__a=1&__d=dis"
 
         headers = {
-            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Origin": "https://snapinsta.app",
-            "Referer": "https://snapinsta.app/"
+            "User-Agent": "Mozilla/5.0"
         }
 
-        response = requests.post(api_url, data={"url": url}, headers=headers)
+        res = requests.get(api_url, headers=headers)
 
-        if response.status_code != 200:
-            return jsonify({'error': 'Failed to fetch video'}), 500
+        if res.status_code != 200:
+            return jsonify({'error': 'Failed to fetch data'}), 500
 
-        html = response.text
+        data = res.json()
 
-        # 🔥 Extract video links
-        video_urls = re.findall(r'https?://[^"\']+\.mp4', html)
+        # 🔥 Extract video URL
+        video_url = None
 
-        if not video_urls:
-            return jsonify({'error': 'Could not extract video'}), 500
-
-        video_url = video_urls[0]
+        try:
+            video_url = data["items"][0]["video_versions"][0]["url"]
+        except:
+            try:
+                video_url = data["graphql"]["shortcode_media"]["video_url"]
+            except:
+                return jsonify({'error': 'Video not found'}), 500
 
         # 🔥 Download video
         video = requests.get(video_url)
