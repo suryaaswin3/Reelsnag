@@ -1,18 +1,13 @@
 from flask import Flask, request, jsonify, send_file
-import requests
-import io
-import re
+import yt_dlp
+import os
+import uuid
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return send_file('index.html')
-
-
-def clean_url(url):
-    # Remove query params like ?igsh=...
-    return url.split("?")[0]
 
 
 @app.route('/download', methods=['POST'])
@@ -24,48 +19,35 @@ def download():
         return jsonify({'error': 'Please provide a URL.'}), 400
 
     try:
-        url = clean_url(url)
+        tmp_path = f"/tmp/{uuid.uuid4()}"
 
-        # 🔥 Convert to JSON endpoint
-        if "/reel/" in url:
-            shortcode = url.split("/reel/")[1].split("/")[0]
-        elif "/p/" in url:
-            shortcode = url.split("/p/")[1].split("/")[0]
-        else:
-            return jsonify({'error': 'Invalid Instagram URL'}), 400
+        ydl_opts = {
+            'outtmpl': tmp_path + '.%(ext)s',
+            'format': 'best',
+            'quiet': True,
+            'no_warnings': True,
 
-        api_url = f"https://www.instagram.com/p/{shortcode}/?__a=1&__d=dis"
-
-        headers = {
-            "User-Agent": "Mozilla/5.0"
+            # 🔥 CRITICAL FIX (prevents blocking)
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            }
         }
 
-        res = requests.get(api_url, headers=headers)
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            file_path = ydl.prepare_filename(info)
 
-        if res.status_code != 200:
-            return jsonify({'error': 'Failed to fetch data'}), 500
+            if not file_path.endswith('.mp4'):
+                file_path = os.path.splitext(file_path)[0] + '.mp4'
 
-        data = res.json()
-
-        # 🔥 Extract video URL
-        video_url = None
-
-        try:
-            video_url = data["items"][0]["video_versions"][0]["url"]
-        except:
-            try:
-                video_url = data["graphql"]["shortcode_media"]["video_url"]
-            except:
-                return jsonify({'error': 'Video not found'}), 500
-
-        # 🔥 Download video
-        video = requests.get(video_url)
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'Download failed'}), 500
 
         return send_file(
-            io.BytesIO(video.content),
-            mimetype='video/mp4',
+            file_path,
             as_attachment=True,
-            download_name='reel.mp4'
+            download_name='reel.mp4',
+            mimetype='video/mp4'
         )
 
     except Exception as e:
