@@ -19,9 +19,17 @@ def download():
         return jsonify({'error': 'Please provide a URL.'}), 400
 
     try:
-        # 🔥 Call SnapInsta backend
+        # 🔥 SnapInsta request (with headers to avoid blocking)
         api_url = "https://snapinsta.app/action.php"
-        response = requests.post(api_url, data={"url": url})
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Origin": "https://snapinsta.app",
+            "Referer": "https://snapinsta.app/"
+        }
+
+        response = requests.post(api_url, data={"url": url}, headers=headers)
 
         if response.status_code != 200:
             return jsonify({'error': 'Failed to fetch video'}), 500
