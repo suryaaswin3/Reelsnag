@@ -30,13 +30,12 @@ def download():
         html = response.text
 
         # 🔥 Extract video link
-        match = re.search(r'https://[^"]+\.mp4', html)
+        video_urls = re.findall(r'https?://[^"\']+\.mp4', html)
 
-        if not match:
-            return jsonify({'error': 'Could not extract video (Instagram may be blocking)'}), 500
+if not video_urls:
+    return jsonify({'error': 'Could not extract video'}), 500
 
-        video_url = match.group(0)
-
+video_url = video_urls[0]
         # 🔥 Download video
         video = requests.get(video_url)
 
