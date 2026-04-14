@@ -21,7 +21,6 @@ def download():
     try:
         # 🔥 Call SnapInsta backend
         api_url = "https://snapinsta.app/action.php"
-
         response = requests.post(api_url, data={"url": url})
 
         if response.status_code != 200:
@@ -29,13 +28,14 @@ def download():
 
         html = response.text
 
-        # 🔥 Extract video link
+        # 🔥 Extract video links
         video_urls = re.findall(r'https?://[^"\']+\.mp4', html)
 
-if not video_urls:
-    return jsonify({'error': 'Could not extract video'}), 500
+        if not video_urls:
+            return jsonify({'error': 'Could not extract video'}), 500
 
-video_url = video_urls[0]
+        video_url = video_urls[0]
+
         # 🔥 Download video
         video = requests.get(video_url)
 
@@ -51,5 +51,5 @@ video_url = video_urls[0]
         return jsonify({'error': str(e)}), 500
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
