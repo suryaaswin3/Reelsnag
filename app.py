@@ -12,13 +12,19 @@ def index():
     return send_file('index.html')
 
 
-# ✅ robots.txt (UPDATED to new sitemap)
+# 🔥 TEST ROUTE (VERY IMPORTANT)
+@app.route('/test123')
+def test():
+    return "THIS IS MY NEW CODE"
+
+
+# ✅ robots.txt
 @app.route('/robots.txt')
 def robots():
     return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/mysitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ NEW WORKING sitemap route (bypass issue)
+# ✅ sitemap (temporary route)
 @app.route('/mysitemap.xml')
 def my_sitemap():
     return send_file('static/sitemap.xml')
@@ -29,7 +35,6 @@ def download():
     data = request.get_json()
     url = data.get('url', '').strip()
 
-    # 🔒 Rate limit
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
     if not hasattr(app, "ip_store"):
@@ -49,7 +54,6 @@ def download():
 
     app.ip_store[user_ip].append(now)
 
-    # 🔒 Validate URL
     if not url:
         return jsonify({'error': 'Please provide a URL.'}), 400
 
@@ -84,7 +88,6 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        # ✅ Cleanup
         @after_this_request
         def cleanup(response):
             try:
