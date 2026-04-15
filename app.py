@@ -12,24 +12,16 @@ def index():
     return send_file('index.html')
 
 
-# ✅ robots.txt (SEO)
+# ✅ robots.txt
 @app.route('/robots.txt')
 def robots():
     return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ FIXED sitemap.xml (using Response)
+# ✅ FORCE sitemap override (THIS FIXES YOUR ISSUE)
 @app.route('/sitemap.xml')
-def sitemap():
-    xml = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://reelsnag.site/</loc>
-    <priority>1.0</priority>
-  </url>
-</urlset>
-"""
-    return Response(xml, mimetype='application/xml')
+def sitemap_override():
+    return send_file('static/sitemap.xml')
 
 
 @app.route('/download', methods=['POST'])
@@ -37,7 +29,6 @@ def download():
     data = request.get_json()
     url = data.get('url', '').strip()
 
-    # 🔒 Rate limit (simple)
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
     if not hasattr(app, "ip_store"):
@@ -57,7 +48,6 @@ def download():
 
     app.ip_store[user_ip].append(now)
 
-    # 🔒 Validate URL
     if not url:
         return jsonify({'error': 'Please provide a URL.'}), 400
 
@@ -76,13 +66,9 @@ def download():
             'format': 'best',
             'quiet': True,
             'no_warnings': True,
-
-            # 🔥 Prevent blocking
             'http_headers': {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             },
-
-            # 🔥 Timeout protection
             'socket_timeout': 10
         }
 
@@ -90,14 +76,12 @@ def download():
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info)
 
-            # keep your original fix
             if not file_path.endswith('.mp4'):
                 file_path = os.path.splitext(file_path)[0] + '.mp4'
 
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        # ✅ SAFE CLEANUP
         @after_this_request
         def cleanup(response):
             try:
