@@ -12,10 +12,23 @@ def index():
     return send_file('index.html')
 
 
-# ✅ NEW: robots.txt route (SEO)
+# ✅ robots.txt (SEO)
 @app.route('/robots.txt')
 def robots():
     return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
+
+
+# ✅ sitemap.xml (SEO)
+@app.route('/sitemap.xml')
+def sitemap():
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://reelsnag.site/</loc>
+      <priority>1.0</priority>
+   </url>
+</urlset>
+""", 200, {'Content-Type': 'application/xml'}
 
 
 @app.route('/download', methods=['POST'])
