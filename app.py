@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, after_this_request
+from flask import Flask, request, jsonify, send_file, after_this_request, Response
 import yt_dlp
 import os
 import uuid
@@ -18,17 +18,18 @@ def robots():
     return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ FIXED sitemap.xml (proper XML format)
+# ✅ FIXED sitemap.xml (using Response)
 @app.route('/sitemap.xml')
 def sitemap():
-    return """<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://reelsnag.site/</loc>
     <priority>1.0</priority>
   </url>
 </urlset>
-""", 200, {'Content-Type': 'application/xml'}
+"""
+    return Response(xml, mimetype='application/xml')
 
 
 @app.route('/download', methods=['POST'])
