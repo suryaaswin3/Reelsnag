@@ -3,7 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ReelSnag — Instagram Reel Downloader</title>
+
+  <!-- 🔥 SEO -->
+  <title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>
+
+  <meta name="description" content="Download Instagram reels without watermark in HD. Free, fast, and no login required. Paste your reel link and download instantly.">
+  <meta name="keywords" content="instagram reel downloader, download reels without watermark, instagram video downloader, reel download hd">
+
+  <!-- 🔥 Open Graph -->
+  <meta property="og:title" content="Download Instagram Reels Without Watermark">
+  <meta property="og:description" content="Free tool to download Instagram reels in HD. No login required.">
+  <meta property="og:type" content="website">
+
+  <!-- 🔥 Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ReelSnag",
+    "url": "https://yourdomain.com",
+    "description": "Download Instagram reels without watermark in HD instantly.",
+    "applicationCategory": "Utility",
+    "operatingSystem": "All"
+  }
+  </script>
+
   <link rel="icon" type="image/png" href="/static/favicon.PNG?v=100">
 
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -19,7 +43,6 @@
       --accent2: #ff8c42;
       --text: #f0f0f5;
       --muted: #5a5a72;
-      --success: #3dffa0;
     }
 
     body {
@@ -28,57 +51,21 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 2rem 1rem;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: -200px; left: -200px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(255,61,107,0.12), transparent 70%);
-      z-index: 0;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: -200px; right: -200px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(255,140,66,0.10), transparent 70%);
-      z-index: 0;
-      animation: drift 16s ease-in-out infinite alternate-reverse;
-    }
-
-    @keyframes drift {
-      from { transform: translate(0,0); }
-      to { transform: translate(40px,30px); }
     }
 
     .container {
-      position: relative;
-      z-index: 1;
       width: 100%;
       max-width: 560px;
-      animation: fadeUp 0.6s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
       display: flex;
-      align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
     .logo-icon {
@@ -89,7 +76,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
     }
 
     .logo-text {
@@ -105,41 +91,45 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 2.2rem;
-      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      padding: 2rem;
     }
 
     h1 {
       font-family: 'Syne', sans-serif;
-      font-size: 1.45rem;
-      margin-bottom: 0.4rem;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
     }
 
     .subtitle {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: var(--muted);
-      margin-bottom: 1.8rem;
+      margin-bottom: 1.5rem;
     }
 
-    .input-wrap input {
+    input {
       width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
+      padding: 0.9rem;
       border-radius: 12px;
-      padding: 0.9rem 1.1rem;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
       color: var(--text);
     }
 
     .btn {
       width: 100%;
       margin-top: 1rem;
-      padding: 0.95rem;
+      padding: 0.9rem;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       border: none;
       border-radius: 12px;
       font-weight: bold;
       color: white;
       cursor: pointer;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .status {
@@ -151,11 +141,51 @@
       display: block;
     }
 
+    .progress {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.3s;
+    }
+
+    #previewBox {
+      margin-top: 15px;
+      display: none;
+    }
+
+    iframe {
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      height: 480px;
+    }
+
     .footer {
       margin-top: 2rem;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--muted);
       text-align: center;
+    }
+
+    .seo-text {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .seo-text h2 {
+      margin-top: 15px;
+      color: #ddd;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -171,18 +201,40 @@
 
   <div class="card">
     <h1>Download Instagram Reels</h1>
-    <p class="subtitle">Paste any public reel link below and download it as MP4 in seconds.</p>
+    <p class="subtitle">Download public Instagram reels instantly — no login, no watermark.</p>
 
-    <div class="input-wrap">
-      <input id="urlInput" type="url" placeholder="https://www.instagram.com/reel/..."/>
+    <input id="urlInput" type="url" placeholder="Paste Instagram reel link here..."/>
+
+    <div id="previewBox">
+      <iframe id="previewFrame"></iframe>
     </div>
 
-    <button class="btn" onclick="handleDownload()">Download Reel</button>
+    <button class="btn" id="downloadBtn" onclick="handleDownload()">Download Reel</button>
 
     <div class="status" id="status">
       <span id="statusText"></span>
+
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
     </div>
 
+  </div>
+
+  <!-- 🔥 SEO Content -->
+  <div class="seo-text">
+    <h2>Instagram Reel Downloader Without Watermark</h2>
+    <p>
+      ReelSnag lets you download Instagram reels in high quality without watermark.
+      Simply paste your reel link and download instantly. No login required.
+    </p>
+
+    <h2>How to Download Instagram Reels</h2>
+    <ul>
+      <li>Copy the Instagram reel link</li>
+      <li>Paste it above</li>
+      <li>Click download</li>
+    </ul>
   </div>
 
   <p class="footer">For personal use only · Respect creators' rights</p>
@@ -190,6 +242,40 @@
 </div>
 
 <script>
+const btn = document.getElementById('downloadBtn');
+const bar = document.getElementById('progressBar');
+
+document.getElementById("urlInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") handleDownload();
+});
+
+document.getElementById("urlInput").addEventListener("change", function() {
+  const url = this.value.trim();
+  if (url.includes("instagram.com")) {
+    loadPreview(url);
+  }
+});
+
+async function loadPreview(url) {
+  const box = document.getElementById('previewBox');
+  const frame = document.getElementById('previewFrame');
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&omitscript=true`);
+    const data = await res.json();
+
+    if (data.html) {
+      const srcMatch = data.html.match(/src="([^"]+)"/);
+      if (srcMatch && srcMatch[1]) {
+        frame.src = srcMatch[1];
+        box.style.display = "block";
+      }
+    }
+  } catch {
+    box.style.display = "none";
+  }
+}
+
 async function handleDownload() {
   const url = document.getElementById('urlInput').value.trim();
   const status = document.getElementById('status');
@@ -201,8 +287,19 @@ async function handleDownload() {
     return;
   }
 
-  text.innerText = "Downloading...";
+  btn.disabled = true;
+  btn.innerText = "Downloading...";
   status.className = "status show";
+  text.innerText = "Processing your reel...";
+  bar.style.width = "10%";
+
+  let fakeProgress = 10;
+  const interval = setInterval(() => {
+    if (fakeProgress < 90) {
+      fakeProgress += Math.random() * 10;
+      bar.style.width = fakeProgress + "%";
+    }
+  }, 500);
 
   try {
     const res = await fetch('/download', {
@@ -219,10 +316,15 @@ async function handleDownload() {
     a.download = 'reel.mp4';
     a.click();
 
+    bar.style.width = "100%";
     text.innerText = "Downloaded!";
   } catch {
     text.innerText = "Error downloading";
   }
+
+  clearInterval(interval);
+  btn.disabled = false;
+  btn.innerText = "Download Reel";
 }
 </script>
 
