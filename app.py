@@ -12,6 +12,12 @@ def index():
     return send_file('index.html')
 
 
+# ✅ NEW: robots.txt route (SEO)
+@app.route('/robots.txt')
+def robots():
+    return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
+
+
 @app.route('/download', methods=['POST'])
 def download():
     data = request.get_json()
@@ -77,7 +83,7 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        # ✅ SAFE CLEANUP (added)
+        # ✅ SAFE CLEANUP
         @after_this_request
         def cleanup(response):
             try:
@@ -97,7 +103,6 @@ def download():
         print("ERROR:", str(e))
         msg = str(e).lower()
 
-        # 🔥 Clean user-friendly errors
         if "private" in msg:
             return jsonify({'error': 'Private reels are not supported.'}), 400
         elif "timeout" in msg:
