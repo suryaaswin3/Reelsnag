@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, after_this_request, Response
+from flask import Flask, request, jsonify, send_file, after_this_request
 import yt_dlp
 import os
 import uuid
@@ -12,15 +12,15 @@ def index():
     return send_file('index.html')
 
 
-# ✅ robots.txt
+# ✅ robots.txt (UPDATED to new sitemap)
 @app.route('/robots.txt')
 def robots():
-    return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
+    return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/mysitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ FORCE sitemap override (THIS FIXES YOUR ISSUE)
-@app.route('/sitemap.xml')
-def sitemap_override():
+# ✅ NEW WORKING sitemap route (bypass issue)
+@app.route('/mysitemap.xml')
+def my_sitemap():
     return send_file('static/sitemap.xml')
 
 
@@ -29,6 +29,7 @@ def download():
     data = request.get_json()
     url = data.get('url', '').strip()
 
+    # 🔒 Rate limit
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
     if not hasattr(app, "ip_store"):
@@ -48,6 +49,7 @@ def download():
 
     app.ip_store[user_ip].append(now)
 
+    # 🔒 Validate URL
     if not url:
         return jsonify({'error': 'Please provide a URL.'}), 400
 
@@ -82,6 +84,7 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
+        # ✅ Cleanup
         @after_this_request
         def cleanup(response):
             try:
