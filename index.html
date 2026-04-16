@@ -32,9 +32,9 @@
   </script>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/static/favicon.PNG?v=3">
-  <link rel="shortcut icon" href="/static/favicon.PNG?v=3">
-  <link rel="icon" href="/static/favicon.PNG?v=3">
+  <link rel="icon" type="image/png" href="/static/favicon.PNG?v=4">
+  <link rel="shortcut icon" href="/static/favicon.PNG?v=4">
+  <link rel="icon" href="/static/favicon.PNG?v=4">
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FXNM54KLMJ"></script>
@@ -142,19 +142,8 @@
       cursor: pointer;
     }
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .status {
-      margin-top: 1rem;
-      display: none;
-    }
-
-    .status.show {
-      display: block;
-    }
+    .status { margin-top: 1rem; display: none; }
+    .status.show { display: block; }
 
     .progress {
       height: 6px;
@@ -171,10 +160,7 @@
       transition: width 0.3s;
     }
 
-    #previewBox {
-      margin-top: 15px;
-      display: none;
-    }
+    #previewBox { margin-top: 15px; display: none; }
 
     iframe {
       width: 100%;
@@ -188,19 +174,6 @@
       font-size: 0.75rem;
       color: var(--muted);
       text-align: center;
-    }
-
-    .seo-text {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #aaa;
-      line-height: 1.6;
-    }
-
-    .seo-text h2 {
-      margin-top: 15px;
-      color: #ddd;
-      font-size: 16px;
     }
   </style>
 </head>
@@ -234,27 +207,11 @@
 
     <div class="status" id="status">
       <span id="statusText"></span>
-
       <div class="progress">
         <div class="progress-bar" id="progressBar"></div>
       </div>
     </div>
 
-  </div>
-
-  <div class="seo-text">
-    <h2>Instagram Reel Downloader Without Watermark</h2>
-    <p>
-      ReelSnag lets you download Instagram reels in high quality without watermark.
-      Simply paste your reel link and download instantly. No login required.
-    </p>
-
-    <h2>How to Download Instagram Reels</h2>
-    <ul>
-      <li>Copy the Instagram reel link</li>
-      <li>Paste it above</li>
-      <li>Click download</li>
-    </ul>
   </div>
 
   <p class="footer">For personal use only · Respect creators' rights</p>
@@ -265,60 +222,49 @@
 const btn = document.getElementById('downloadBtn');
 const bar = document.getElementById('progressBar');
 
-document.getElementById("urlInput").addEventListener("keypress", function(e) {
+document.getElementById("urlInput").addEventListener("keypress", e => {
   if (e.key === "Enter") handleDownload();
+});
+
+document.getElementById("urlInput").addEventListener("paste", () => {
+  gtag('event', 'url_paste');
 });
 
 document.getElementById("urlInput").addEventListener("change", function() {
   const url = this.value.trim();
-  if (url.includes("instagram.com")) {
-    loadPreview(url);
-  }
+  if (url.includes("instagram.com")) loadPreview(url);
 });
 
 async function loadPreview(url) {
-  const box = document.getElementById('previewBox');
-  const frame = document.getElementById('previewFrame');
-
   try {
     const res = await fetch(`https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&omitscript=true`);
     const data = await res.json();
-
     if (data.html) {
-      const srcMatch = data.html.match(/src="([^"]+)"/);
-      if (srcMatch && srcMatch[1]) {
-        frame.src = srcMatch[1];
-        box.style.display = "block";
+      const src = data.html.match(/src="([^"]+)"/)?.[1];
+      if (src) {
+        previewFrame.src = src;
+        previewBox.style.display = "block";
+        gtag('event', 'preview_loaded');
       }
     }
-  } catch {
-    box.style.display = "none";
-  }
+  } catch {}
 }
 
 async function handleDownload() {
-  const url = document.getElementById('urlInput').value.trim();
-  const status = document.getElementById('status');
-  const text = document.getElementById('statusText');
+  const url = urlInput.value.trim();
+  if (!url) return;
 
-  if (!url) {
-    status.className = "status show";
-    text.innerText = "Paste URL first";
-    return;
-  }
+  gtag('event', 'download_click', { event_label: url });
 
   btn.disabled = true;
   btn.innerText = "Downloading...";
   status.className = "status show";
-  text.innerText = "Processing your reel...";
+  statusText.innerText = "Processing...";
   bar.style.width = "10%";
 
-  let fakeProgress = 10;
-  const interval = setInterval(() => {
-    if (fakeProgress < 90) {
-      fakeProgress += Math.random() * 10;
-      bar.style.width = fakeProgress + "%";
-    }
+  let p = 10;
+  const i = setInterval(() => {
+    if (p < 90) bar.style.width = (p += Math.random()*10) + "%";
   }, 500);
 
   try {
@@ -331,18 +277,28 @@ async function handleDownload() {
     if (!res.ok) throw new Error();
 
     const blob = await res.blob();
+
+    gtag('event', 'download_success');
+
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'reel.mp4';
     a.click();
 
     bar.style.width = "100%";
-    text.innerText = "Downloaded!";
+    statusText.innerText = "Downloaded!";
+
+    navigator.share?.({
+      title: 'ReelSnag',
+      url: 'https://reelsnag.site'
+    });
+
   } catch {
-    text.innerText = "Error downloading";
+    gtag('event', 'download_failed');
+    statusText.innerText = "Error downloading";
   }
 
-  clearInterval(interval);
+  clearInterval(i);
   btn.disabled = false;
   btn.innerText = "Download Now (HD, No Watermark)";
 }
