@@ -12,21 +12,21 @@ def index():
     return send_file('index.html')
 
 
-# 🔥 TEST ROUTE (VERY IMPORTANT)
+# 🔥 TEST ROUTE (keep for now)
 @app.route('/test123')
 def test():
     return "THIS IS MY NEW CODE"
 
 
-# ✅ robots.txt
+# ✅ robots.txt (FIXED)
 @app.route('/robots.txt')
 def robots():
-    return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/mysitemap.xml", 200, {'Content-Type': 'text/plain'}
+    return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ sitemap (temporary route)
-@app.route('/mysitemap.xml')
-def my_sitemap():
+# ✅ FINAL sitemap route (ONLY THIS ONE)
+@app.route('/sitemap.xml')
+def sitemap():
     return send_file('static/sitemap.xml')
 
 
