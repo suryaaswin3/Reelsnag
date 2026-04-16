@@ -7,36 +7,57 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
+
+# 🔐 Basic security headers
+@app.after_request
+def add_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    return response
+
+
 @app.route('/')
 def index():
     return send_file('index.html')
 
 
-# 🔥 TEST ROUTE (keep for now)
+# 🔥 TEST ROUTE
 @app.route('/test123')
 def test():
     return "THIS IS MY NEW CODE"
 
 
-# ✅ robots.txt (FIXED)
+# ✅ robots.txt
 @app.route('/robots.txt')
 def robots():
     return "User-agent: *\nAllow: /\nSitemap: https://reelsnag.site/sitemap.xml", 200, {'Content-Type': 'text/plain'}
 
 
-# ✅ FINAL sitemap route (ONLY THIS ONE)
+# ✅ sitemap
 @app.route('/sitemap.xml')
 def sitemap():
     return send_file('static/sitemap.xml')
 
 
+# 🔧 Helper: get real IP safely
+def get_user_ip():
+    forwarded = request.headers.get('X-Forwarded-For', '')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.remote_addr
+
+
 @app.route('/download', methods=['POST'])
 def download():
-    data = request.get_json()
-    url = data.get('url', '').strip()
+    try:
+        data = request.get_json(force=True)
+        url = data.get('url', '').strip()
+    except:
+        return jsonify({'error': 'Invalid request'}), 400
 
-    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    user_ip = get_user_ip()
 
+    # 🔒 Rate limit
     if not hasattr(app, "ip_store"):
         app.ip_store = {}
 
@@ -44,9 +65,7 @@ def download():
     window = 60
     limit = 5
 
-    if user_ip not in app.ip_store:
-        app.ip_store[user_ip] = []
-
+    app.ip_store.setdefault(user_ip, [])
     app.ip_store[user_ip] = [t for t in app.ip_store[user_ip] if now - t < window]
 
     if len(app.ip_store[user_ip]) >= limit:
@@ -54,6 +73,7 @@ def download():
 
     app.ip_store[user_ip].append(now)
 
+    # 🔒 Validate URL
     if not url:
         return jsonify({'error': 'Please provide a URL.'}), 400
 
@@ -88,10 +108,12 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
+        # 🧹 Cleanup after response
         @after_this_request
         def cleanup(response):
             try:
-                os.remove(file_path)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
             except Exception as e:
                 print("Cleanup error:", e)
             return response
