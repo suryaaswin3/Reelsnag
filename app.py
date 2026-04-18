@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, send_file, after_this_request
+from flask import Flask, request, jsonify, send_file
 import yt_dlp
 import os
 import uuid
 import time
+import threading
 from urllib.parse import urlparse
 
 app = Flask(__name__)
@@ -16,6 +17,15 @@ def add_headers(response):
 @app.route('/')
 def index():
     return send_file('index.html')
+
+# 🔥 delayed cleanup function
+def delete_file_later(path):
+    time.sleep(3)  # wait for download to complete
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+    except:
+        pass
 
 @app.route('/download', methods=['POST'])
 def download():
@@ -55,16 +65,9 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        @after_this_request
-        def cleanup(response):
-            try:
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-            except:
-                pass
-            return response
+        # 🔥 delayed delete (FIX)
+        threading.Thread(target=delete_file_later, args=(file_path,)).start()
 
-        # 🔥 FIXED PART
         response = send_file(
             file_path,
             as_attachment=True,
