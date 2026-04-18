@@ -18,14 +18,16 @@ def add_headers(response):
 def index():
     return send_file('index.html')
 
-# 🔥 delayed cleanup function
+
+# 🔥 NEW: delayed cleanup
 def delete_file_later(path):
-    time.sleep(3)  # wait for download to complete
+    time.sleep(2)  # small delay fixes your bug
     try:
         if os.path.exists(path):
             os.remove(path)
     except:
         pass
+
 
 @app.route('/download', methods=['POST'])
 def download():
@@ -65,25 +67,20 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        # 🔥 delayed delete (FIX)
+        # 🔥 FIX: delayed deletion instead of immediate
         threading.Thread(target=delete_file_later, args=(file_path,)).start()
 
-        response = send_file(
+        return send_file(
             file_path,
             as_attachment=True,
-            download_name=f"reelsnag_{int(time.time())}.mp4",
+            download_name='reel.mp4',
             mimetype='video/mp4'
         )
-
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-
-        return response
 
     except Exception as e:
         print("ERROR:", str(e))
         return jsonify({'error': 'Failed to download'}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
