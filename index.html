@@ -4,103 +4,245 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>Download Instagram Reels Without Watermark | ReelSnag</title>
+  <title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FXNM54KLMJ"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-FXNM54KLMJ');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FXNM54KLMJ');
   </script>
 
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff3d6b;
+      --accent2: #ff8c42;
+      --text: #f0f0f5;
+      --muted: #5a5a72;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #0a0a0f;
-      color: white;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 2rem 1rem;
     }
 
-    .box {
-      background: #111118;
-      padding: 30px;
-      border-radius: 12px;
+    .container {
       width: 100%;
-      max-width: 400px;
-      text-align: center;
+      max-width: 560px;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
+      padding: 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
     }
 
-    button {
+    .btn {
       width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      background: #ff3d6b;
+      margin-top: 1rem;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       border: none;
-      color: white;
-      border-radius: 8px;
+      border-radius: 12px;
       font-weight: bold;
+      color: white;
       cursor: pointer;
+    }
+
+    .status { margin-top: 1rem; display: none; }
+    .status.show { display: block; }
+
+    .progress {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.3s;
+    }
+
+    #previewBox { margin-top: 15px; display: none; }
+
+    iframe {
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      height: 480px;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
     }
   </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>ReelSnag</h2>
-  <p>Download Instagram reels without watermark</p>
+<div class="container">
 
-  <input id="urlInput" type="text" placeholder="Paste reel link here..." />
+  <div class="logo">
+    <div class="logo-icon">⬇</div>
+    <span class="logo-text">ReelSnag</span>
+  </div>
 
-  <button id="downloadBtn" onclick="handleDownload()">
-    Download
-  </button>
+  <div class="card">
+    <h1>Download Instagram Reels</h1>
+    <p class="subtitle">Download public Instagram reels instantly — no login, no watermark.</p>
+
+    <input id="urlInput" type="url" placeholder="Paste Instagram reel link here..."/>
+
+    <div id="previewBox">
+      <iframe id="previewFrame"></iframe>
+    </div>
+
+    <button class="btn" id="downloadBtn" onclick="handleDownload()">
+      Download Now (HD, No Watermark)
+    </button>
+
+    <div style="margin-top:10px;font-size:12px;color:#aaa;">
+      ✔ No watermark &nbsp; ✔ HD quality &nbsp; ✔ No login
+    </div>
+
+    <div class="status" id="status">
+      <span id="statusText"></span>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="footer">For personal use only · Respect creators' rights</p>
+
 </div>
 
 <script>
 const btn = document.getElementById('downloadBtn');
-const input = document.getElementById('urlInput');
+const bar = document.getElementById('progressBar');
 
-input.addEventListener("keypress", e => {
+document.getElementById("urlInput").addEventListener("keypress", e => {
   if (e.key === "Enter") handleDownload();
 });
 
-input.addEventListener("paste", () => {
+document.getElementById("urlInput").addEventListener("paste", () => {
   gtag('event', 'url_paste');
 });
 
+document.getElementById("urlInput").addEventListener("change", function() {
+  const url = this.value.trim();
+  if (url.includes("instagram.com")) loadPreview(url);
+});
+
+async function loadPreview(url) {
+  try {
+    const res = await fetch(`https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&omitscript=true`);
+    const data = await res.json();
+    if (data.html) {
+      const src = data.html.match(/src="([^"]+)"/)?.[1];
+      if (src) {
+        previewFrame.src = src;
+        previewBox.style.display = "block";
+        gtag('event', 'preview_loaded');
+      }
+    }
+  } catch {}
+}
+
 function handleDownload() {
-  const url = input.value.trim();
+  const url = urlInput.value.trim();
   if (!url) return;
 
-  gtag('event', 'download_click');
+  gtag('event', 'download_click', { event_label: url });
 
   btn.disabled = true;
   btn.innerText = "Downloading...";
+  status.className = "status show";
+  statusText.innerText = "Processing...";
+  bar.style.width = "30%";
 
-  // 🔥 FIXED DOWNLOAD METHOD
+  // 🔥 FIXED DOWNLOAD (NO BLOB)
   const downloadUrl = `/download?url=${encodeURIComponent(url)}&t=${Date.now()}`;
-
   window.open(downloadUrl, '_blank');
 
-  // assume success
   setTimeout(() => {
+    bar.style.width = "100%";
+    statusText.innerText = "Downloaded!";
     gtag('event', 'download_success');
+
     btn.disabled = false;
-    btn.innerText = "Download";
+    btn.innerText = "Download Now (HD, No Watermark)";
   }, 2000);
 }
 </script>
