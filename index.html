@@ -1,59 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>ReelSnag</title>
+  <title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FXNM54KLMJ"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-FXNM54KLMJ');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FXNM54KLMJ"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FXNM54KLMJ');
+  </script>
 
-<style>
-body {
-  font-family: Arial;
-  background: #0a0a0f;
-  color: white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.box {
-  background:#111118;
-  padding:20px;
-  border-radius:10px;
-  width:300px;
-  text-align:center;
-}
-input {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
-button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff3d6b;
+      --accent2: #ff8c42;
+      --text: #f0f0f5;
+      --muted: #5a5a72;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    .status { margin-top: 1rem; display: none; }
+    .status.show { display: block; }
+
+    .progress {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.3s;
+    }
+
+    #previewBox { margin-top: 15px; display: none; }
+
+    iframe {
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      height: 480px;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="box">
-<h2>ReelSnag</h2>
+<div class="container">
 
-<input id="urlInput" placeholder="Paste reel link"/>
+  <div class="logo">
+    <div class="logo-icon">⬇</div>
+    <span class="logo-text">ReelSnag</span>
+  </div>
 
-<button id="downloadBtn" onclick="handleDownload()">Download</button>
+  <div class="card">
+    <h1>Download Instagram Reels</h1>
+    <p class="subtitle">Download public Instagram reels instantly — no login, no watermark.</p>
 
-<p id="status"></p>
+    <input id="urlInput" type="url" placeholder="Paste Instagram reel link here..."/>
+
+    <button class="btn" id="downloadBtn" onclick="handleDownload()">
+      Download Now (HD, No Watermark)
+    </button>
+
+    <div class="status" id="status">
+      <span id="statusText"></span>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 
@@ -62,47 +182,42 @@ async function handleDownload() {
   const url = urlInput.value.trim();
   if (!url) return;
 
-  gtag('event','download_click');
-
   downloadBtn.innerText = "Downloading...";
   downloadBtn.disabled = true;
 
   try {
     const res = await fetch('/download', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({url})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
     });
 
     if (!res.ok) throw new Error();
 
     const blob = await res.blob();
 
-    const fileName = "reelsnag_" + Date.now() + ".mp4";
     const objectUrl = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = objectUrl;
-    a.download = fileName;
+    a.download = "reelsnag_" + Date.now() + ".mp4";
 
     document.body.appendChild(a);
     a.click();
 
-    setTimeout(()=>{
+    setTimeout(() => {
       URL.revokeObjectURL(objectUrl);
       a.remove();
-    },1500);
+    }, 1500);
 
-    status.innerText = "Downloaded!";
-    gtag('event','download_success');
-
+    downloadBtn.innerText = "Downloaded!";
   } catch {
-    status.innerText = "Error downloading";
-    gtag('event','download_failed');
+    downloadBtn.innerText = "Error";
   }
 
-  downloadBtn.innerText = "Download";
-  downloadBtn.disabled = false;
+  setTimeout(() => {
+    downloadBtn.innerText = "Download Now (HD, No Watermark)";
+    downloadBtn.disabled = false;
+  }, 2000);
 }
 </script>
 
