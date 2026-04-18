@@ -26,14 +26,14 @@ def download():
         return jsonify({'error': 'Invalid request'}), 400
 
     if not url:
-        return jsonify({'error': 'No URL'}), 400
+        return jsonify({'error': 'Please provide a URL.'}), 400
 
     try:
         parsed = urlparse(url)
         if "instagram.com" not in parsed.netloc:
             return jsonify({'error': 'Invalid Instagram URL'}), 400
     except:
-        return jsonify({'error': 'Invalid URL'}), 400
+        return jsonify({'error': 'Invalid URL format'}), 400
 
     try:
         tmp_path = f"/tmp/{uuid.uuid4()}"
@@ -64,7 +64,7 @@ def download():
                 pass
             return response
 
-        # 🔥 FIXED RESPONSE
+        # 🔥 FIXED PART
         response = send_file(
             file_path,
             as_attachment=True,
@@ -80,7 +80,7 @@ def download():
 
     except Exception as e:
         print("ERROR:", str(e))
-        return jsonify({'error': 'Download failed'}), 500
+        return jsonify({'error': 'Failed to download'}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
