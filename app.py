@@ -604,11 +604,25 @@ def download():
         data = request.get_json(silent=True) or {}
         url = data.get("url", "").strip()
 
-        if not url or "instagram.com" not in url:
+        if not url:
+            return jsonify({"error": "Invalid URL"}), 400
+
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        if "instagram.com" not in parsed.netloc:
             return jsonify({"error": "Invalid URL"}), 400
 
         tmp_dir = "/tmp/reelsnag" if os.name != 'nt' else os.path.join(os.environ.get('TEMP', '.'), 'reelsnag')
         os.makedirs(tmp_dir, exist_ok=True)
+
+        # 🔥 CLEAN TEMP FILES (IMPORTANT)
+        for f in os.listdir(tmp_dir):
+            full_path = os.path.join(tmp_dir, f)
+            if os.path.isfile(full_path):
+                try:
+                    os.remove(full_path)
+                except:
+                    pass
 
         file_id = str(uuid.uuid4())
         path = os.path.join(tmp_dir, file_id)
@@ -621,11 +635,11 @@ def download():
             'merge_output_format': 'mp4',
         }
 
-        # ✅ DOWNLOAD FIRST
+        # ✅ DOWNLOAD
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.extract_info(url, download=True)
 
-        # ✅ THEN FIND FILE
+        # ✅ FIND FILE
         file_path = None
         for f in os.listdir(tmp_dir):
             if f.startswith(file_id) and f.endswith(".mp4"):
@@ -634,6 +648,21 @@ def download():
 
         if not file_path:
             raise Exception("Final video not found")
+
+        # 🔥 VALIDATE FILE (avoid audio-only issue)
+        if os.path.getsize(file_path) < 500000:
+            raise Exception("Invalid or incomplete video")
+
+        # 🔥 CLEANUP THREAD
+        def cleanup():
+            time.sleep(300)
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                logger.error(f"Cleanup error: {e}")
+
+        threading.Thread(target=cleanup, daemon=True).start()
 
         return send_file(
             file_path,
