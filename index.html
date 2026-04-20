@@ -900,6 +900,7 @@ function trackEvent(event, page, extra = {}) {
   }).catch(() => {});
 }
 
+<script>
 // Main download handler
 async function handleDownload() {
   const urlInput = document.getElementById("urlInput");
@@ -915,12 +916,40 @@ async function handleDownload() {
     return;
   }
 
+  // ✅ VALIDATION (kept your logic)
+  if (!isValidInstagramUrl(url)) {
+    urlInput.classList.add('error');
+    status.classList.add("show");
+    statusText.innerText = "Please enter a valid Instagram reel URL";
+    statusText.classList.add('error');
+
+    setTimeout(() => {
+      urlInput.classList.remove('error');
+      statusText.classList.remove('error');
+    }, 3000);
+
+    trackEvent('download_error', window.location.pathname, { reason: 'invalid_url' });
+    return;
+  }
+
+  // UI state
+  urlInput.classList.remove('error');
+  urlInput.classList.add('success');
+  setTimeout(() => urlInput.classList.remove('success'), 1000);
+
+  localStorage.setItem("lastReelUrl", url);
+
   downloadBtn.disabled = true;
+  downloadBtn.innerText = "Processing...";
+
   status.classList.add("show");
   statusText.innerText = "Processing...";
+  statusText.classList.remove('error', 'success');
   progressBar.style.width = "30%";
 
   try {
+    trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
+
     const res = await fetch('/download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -932,7 +961,7 @@ async function handleDownload() {
     const contentType = res.headers.get('content-type') || '';
     if (!contentType.includes('video')) {
       const text = await res.text();
-      throw new Error(text || "Invalid response");
+      throw new Error(text || "Invalid file response");
     }
 
     const blob = await res.blob();
@@ -946,148 +975,33 @@ async function handleDownload() {
     document.body.appendChild(a);
     a.click();
 
+    // ✅ CLEANUP (fixes 3rd time bug)
     URL.revokeObjectURL(objectUrl);
     a.remove();
 
-    statusText.innerText = "Download complete";
-
-  } catch (err) {
-    statusText.innerText = err.message;
-  } finally {
-    downloadBtn.disabled = false;
-    progressBar.style.width = "0%";
-  }
-}
-
-  if (!isValidInstagramUrl(url)) {
-    urlInput.classList.add('error');
-    status.classList.add("show");
-    statusText.innerText = "Please enter a valid Instagram reel URL";
-    statusText.classList.add('error');
-    setTimeout(() => {
-      urlInput.classList.remove('error');
-      statusText.classList.remove('error');
-    }, 3000);
-    trackEvent('download_error', window.location.pathname, { reason: 'invalid_url' });
-    return;
-  }
-
-  urlInput.classList.remove('error');
-  urlInput.classList.add('success');
-  setTimeout(() => urlInput.classList.remove('success'), 1000);
-
-  // Save to localStorage
-  localStorage.setItem("lastReelUrl", url);
-
-  // Show progress
-  status.classList.add("show");
-  statusText.innerText = "Preparing download...";
-  statusText.classList.remove('error');
-  progressBar.style.width = "30%";
-
-  downloadBtn.innerText = "Processing...";
-  downloadBtn.disabled = true;
-
-  // Track attempt
-  try {
-  // Track attempt
-  trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
-
-  const res = await fetch('/download', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ url })
-  });
-
-  if (!res.ok) {
-    throw new Error("Server error");
-  }
-
-  const contentType = res.headers.get('content-type') || '';
-  if (!contentType.includes('video')) {
-    const text = await res.text();
-    throw new Error(text || "Invalid file response");
-  }
-
-  const blob = await res.blob();
-
-  progressBar.style.width = "100%";
-
-  const objectUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = objectUrl;
-  a.download = "reelsnag_" + Date.now() + ".mp4";
-
-  document.body.appendChild(a);
-  a.click();
-
-  // ✅ CLEANUP (VERY IMPORTANT)
-  URL.revokeObjectURL(objectUrl);
-  a.remove();
-
-} catch (err) {
-  console.error(err);
-  alert(err.message || "Download failed");
-} finally {
-  // ✅ RESET UI
-  downloadBtn.classList.remove('loading');
-  downloadBtn.disabled = false;
-}
-    progressBar.style.width = "90%";
-
-    // Trigger download immediately (preserves user gesture chain)
-    progressBar.style.width = "100%";
-
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = objectUrl;
-    a.download = "reelsnag_" + Date.now() + ".mp4";
-
-    document.body.appendChild(a);
-    a.click();
-
-    // Cleanup after download starts
-    setTimeout(() => {
-      URL.revokeObjectURL(objectUrl);
-      a.remove();
-    }, 100);
-
-    // Success state
+    // Success
     statusText.innerText = "Download complete!";
     statusText.classList.add('success');
     downloadBtn.innerText = "Downloaded!";
 
-    // Track success
     trackEvent('download_success', window.location.pathname);
 
-    // Share if available
-    if (navigator.share) {
-      navigator.share({
-        title: "ReelSnag",
-        text: "Downloaded a reel with ReelSnag!",
-        url: window.location.origin
-      }).catch(() => {});
-    }
-
   } catch (err) {
-    statusText.innerText = err.message || "Download failed. Please try again.";
+    statusText.innerText = err.message || "Download failed";
     statusText.classList.add('error');
     downloadBtn.innerText = "Try Again";
 
-    // Track error
     trackEvent('download_error', window.location.pathname, { reason: err.message });
-  }
 
-  // Reset after delay
-  setTimeout(() => {
-    downloadBtn.innerText = "Download Now (HD, No Watermark)";
-    downloadBtn.disabled = false;
-    progressBar.style.width = "0%";
-    status.classList.remove("show");
-    statusText.classList.remove('success', 'error');
-  }, 2500);
+  } finally {
+    setTimeout(() => {
+      downloadBtn.innerText = "Download Now (HD, No Watermark)";
+      downloadBtn.disabled = false;
+      progressBar.style.width = "0%";
+      status.classList.remove("show");
+      statusText.classList.remove('success', 'error');
+    }, 2000);
+  }
 }
 </script>
 
