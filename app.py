@@ -614,7 +614,7 @@ def download():
         path = os.path.join(tmp_dir, file_id)
 
         ydl_opts = {
-            'outtmpl': path + '.%(ext)s',
+            'outtmpl': path + '_%(id)s.%(ext)s',
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
@@ -625,17 +625,16 @@ def download():
             'fragment_retries': 2,
             'http_chunk_size': 10485760,
         }
+        # 🔥 Find actual merged mp4 file
+       file_path = None
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            file_path = ydl.prepare_filename(info)
+       for f in os.listdir(tmp_dir):
+       if f.startswith(file_id) and f.endswith(".mp4"):
+        file_path = os.path.join(tmp_dir, f)
+        break
 
-        # ✅ FIX: ensure correct merged file
-        if not file_path.endswith(".mp4"):
-            file_path = os.path.splitext(file_path)[0] + ".mp4"
-
-        if not os.path.exists(file_path):
-            raise Exception("Final video file not found")
+       if not file_path:
+        raise Exception("Final merged video not found")
 
         # Cleanup thread
         def cleanup():
@@ -657,9 +656,9 @@ def download():
         res.headers['X-Site-URL'] = request.host_url.rstrip('/')
         return res
 
-    except Exception as e:
-        logger.error(f"Download error: {e}")
-        return jsonify({"error": "Download failed. Please check the URL and try again."}), 500
+        except Exception as e:
+         logger.error(f"Download error: {e}")
+         return jsonify({"error": "Download failed. Please check the URL and try again."}), 500
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, threaded=True)
