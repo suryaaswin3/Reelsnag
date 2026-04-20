@@ -592,7 +592,7 @@ def index():
     with open("index.html", "r", encoding='utf-8') as f:
         html = f.read()
 
-    return inject_seo_cached(html, 'home', '')
+   return inject_seo_cached(html, 'download-instagram-reels', '')
 
 
 # PROGRAMMATIC SEO ROUTE
