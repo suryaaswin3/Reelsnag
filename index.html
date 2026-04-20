@@ -534,10 +534,7 @@
 <script>
 // Initialize page on load
 window.onload = function() {
-  // Restore last URL
-  const lastUrl = localStorage.getItem("lastReelUrl");
-  if (lastUrl) document.getElementById("urlInput").value = lastUrl;
-
+  
   // Apply SEO content
   if (window.dynamicSEO) {
     document.getElementById("mainHeading").innerText = dynamicSEO.heading;
@@ -680,19 +677,30 @@ function generateRelatedPages() {
   `;
 }
 
-// Paste from clipboard
 async function pasteFromClipboard() {
   try {
     const text = await navigator.clipboard.readText();
     const input = document.getElementById('urlInput');
-    input.value = text.trim();
+
+    // ✅ FIX: force refresh so paste works multiple times
+    input.value = '';
+    setTimeout(() => {
+      input.value = text.trim();
+    }, 50);
+
     input.classList.add('success');
     setTimeout(() => input.classList.remove('success'), 1000);
+
   } catch (err) {
-    // Fallback: prompt user
     const text = prompt('Paste your Instagram reel link:');
     if (text) {
-      document.getElementById('urlInput').value = text.trim();
+      const input = document.getElementById('urlInput');
+
+      // ✅ same fix in fallback
+      input.value = '';
+      setTimeout(() => {
+        input.value = text.trim();
+      }, 50);
     }
   }
 }
@@ -769,8 +777,6 @@ async function handleDownload() {
   urlInput.classList.add('success');
   setTimeout(() => urlInput.classList.remove('success'), 1000);
 
-  // Save to localStorage
-  localStorage.setItem("lastReelUrl", url);
 
   // Show progress
   status.classList.add("show");
