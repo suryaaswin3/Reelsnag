@@ -482,7 +482,6 @@ def track():
     try:
         data = request.get_json(force=True, silent=True) or {}
 
-        # Get additional data from request
         user_agent = request.headers.get('User-Agent', 'unknown')
         referrer = request.headers.get('Referer', 'direct')
         device_type = get_device_type(user_agent)
@@ -501,41 +500,34 @@ def track():
         }
 
         tracking = load_tracking_data()
-if not isinstance(tracking.get('page_views'), dict):
-    tracking['page_views'] = {}
 
-if not isinstance(tracking.get('events'), list):
-    tracking['events'] = []
+        if not isinstance(tracking.get('page_views'), dict):
+            tracking['page_views'] = {}
 
-if not isinstance(tracking.get('downloads'), int):
-    tracking['downloads'] = 0
+        if not isinstance(tracking.get('events'), list):
+            tracking['events'] = []
 
-        tracking.setdefault('events', [])
-        tracking.setdefault('page_views', {})
-        tracking.setdefault('downloads', 0)
+        if not isinstance(tracking.get('downloads'), int):
+            tracking['downloads'] = 0
 
         tracking['events'].append(track_data)
 
-        # Track page views ONLY for pageview
         if track_data['event'] == 'pageview':
             page = track_data['page']
             if page not in tracking['page_views']:
                 tracking['page_views'][page] = 0
             tracking['page_views'][page] += 1
 
-        # Track downloads
         if track_data['event'] == 'download_success':
             tracking['downloads'] += 1
 
         save_tracking_data(tracking)
 
-        logger.info(f"TRACK: {track_data['event']} on {track_data['page']}")
         return jsonify({"ok": True})
 
     except Exception as e:
         logger.error(f"Track error: {e}")
         return jsonify({"ok": True})
-
 # ---------------- STATS ENDPOINT ----------------
 @app.route('/stats')
 def stats():
