@@ -451,6 +451,45 @@ def get_related_pages(current_slug):
 
 @lru_cache(maxsize=50)
 def inject_seo_cached(html, seo_key, slug):
+    try:
+        seo = SEO_PAGES.get(seo_key)
+
+        if not seo:
+            seo = {
+                "title": f"{slug.replace('-', ' ').title()} | ReelSnag",
+                "description": f"Download Instagram reels using {slug.replace('-', ' ')}.",
+                "heading": slug.replace('-', ' ').title(),
+                "subtitle": "Download Instagram reels instantly",
+                "content": f"Use ReelSnag to {slug.replace('-', ' ')} without watermark in HD.",
+            }
+
+        canonical_url = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
+
+        seo_script = f"""
+<script id="page-seo">
+window.SERVER_SEO = {json.dumps(seo)};
+</script>
+"""
+        html = html.replace("</head>", seo_script + "\n</head>")
+
+        # SAFE replacements (only if exists)
+        if "<title>" in html:
+            html = html.replace(
+                "<title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>",
+                f"<title>{seo['title']}</title>"
+            )
+
+        if 'rel="canonical"' in html:
+            html = html.replace(
+                '<link rel="canonical" href="https://reelsnag.site/" />',
+                f'<link rel="canonical" href="{canonical_url}" />'
+            )
+
+        return html
+
+    except Exception as e:
+        print("SEO INJECTION ERROR:", str(e))
+        return html:
     """Cached SEO injection."""
     seo = SEO_PAGES.get(seo_key, SEO_PAGES["download-instagram-reels"])
 
@@ -559,7 +598,15 @@ def index():
 # PROGRAMMATIC SEO ROUTE
 @app.route('/<slug>')
 def seo_page(slug):
-    if slug not in SEO_PAGES:
+    try:
+        with open("index.html", "r", encoding='utf-8') as f:
+            html = f.read()
+
+        return make_response(inject_seo_cached(html, slug, slug))
+
+    except Exception as e:
+        print("SEO PAGE ERROR:", str(e))
+        return "Error", 500
         # Fallback for unknown slugs - still create a valid page
         seo = {
             "title": f"{slug.replace('-', ' ').title()} | ReelSnag",
