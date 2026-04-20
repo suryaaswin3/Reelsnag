@@ -598,77 +598,36 @@ def download():
     ip = request.remote_addr or "unknown"
 
     if not check_rate_limit(ip):
-        return jsonify({"error": "Too many requests"}), 429
+        return jsonify({"error": "Too many requests. Please wait."}), 429
 
     try:
         data = request.get_json(silent=True) or {}
         url = data.get("url", "").strip()
 
-        if not url:
-            return jsonify({"error": "Invalid URL"}), 400
-
-        from urllib.parse import urlparse
-        parsed = urlparse(url)
-        if "instagram.com" not in parsed.netloc:
-            return jsonify({"error": "Invalid URL"}), 400
+        if not url or "instagram.com" not in url:
+            return jsonify({"error": "Invalid Instagram URL"}), 400
 
         tmp_dir = "/tmp/reelsnag" if os.name != 'nt' else os.path.join(os.environ.get('TEMP', '.'), 'reelsnag')
         os.makedirs(tmp_dir, exist_ok=True)
-
-        # 🔥 CLEAN TEMP FILES (IMPORTANT)
-        for f in os.listdir(tmp_dir):
-            full_path = os.path.join(tmp_dir, f)
-            if os.path.isfile(full_path):
-                try:
-                    os.remove(full_path)
-                except:
-                    pass
 
         file_id = str(uuid.uuid4())
         path = os.path.join(tmp_dir, file_id)
 
         ydl_opts = {
-            'outtmpl': path + '_%(id)s.%(ext)s',
+            'outtmpl': path + '.%(ext)s',
             'quiet': True,
             'no_warnings': True,
-            'format': 'bestvideo+bestaudio/best',
-            'merge_output_format': 'mp4',
+            'format': 'best',
         }
 
-        # ✅ DOWNLOAD
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.extract_info(url, download=True)
-
-        # ✅ FIND FILE
-        file_path = None
-        for f in os.listdir(tmp_dir):
-            if f.startswith(file_id) and f.endswith(".mp4"):
-                file_path = os.path.join(tmp_dir, f)
-                break
-
-        if not file_path:
-            raise Exception("Final video not found")
-
-        # 🔥 VALIDATE FILE (avoid audio-only issue)
-        if os.path.getsize(file_path) < 500000:
-            raise Exception("Invalid or incomplete video")
-
-        # 🔥 CLEANUP THREAD
-        def cleanup():
-            time.sleep(300)
-            try:
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-            except Exception as e:
-                logger.error(f"Cleanup error: {e}")
-
-        threading.Thread(target=cleanup, daemon=True).start()
+            info = ydl.extract_info(url, download=True)
+            file_path = ydl.prepare_filename(info)
 
         return send_file(
             file_path,
             as_attachment=True,
-            download_name="reelsnag_download.mp4",
-            mimetype="video/mp4"
+            download_name="reelsnag_download.mp4"
         )
 
     except Exception as e:
