@@ -4,6 +4,7 @@ import os
 import uuid
 import time
 import threading
+import json
 from urllib.parse import urlparse
 
 app = Flask(__name__)
@@ -14,14 +15,78 @@ def add_headers(response):
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     return response
 
+
+# 🔥 SEO CONFIG (SAFE ADD)
+SEO_PAGES = {
+    "download-instagram-reels": {
+        "title": "Download Instagram Reels Free HD | ReelSnag",
+        "heading": "Download Instagram Reels",
+        "subtitle": "Free HD reel downloader online",
+        "content": "Download Instagram reels free in HD with no watermark using ReelSnag."
+    },
+    "reels-downloader": {
+        "title": "Best Reels Downloader Online | ReelSnag",
+        "heading": "Reels Downloader",
+        "subtitle": "Fast and free reel downloader",
+        "content": "Best reels downloader to save Instagram videos instantly without watermark."
+    },
+    "download-instagram-reels-india": {
+        "title": "Download Instagram Reels India | ReelSnag",
+        "heading": "Download Instagram Reels India",
+        "subtitle": "Fast for Jio & Airtel users",
+        "content": "Download Instagram reels in India without watermark. Fast and free tool."
+    }
+}
+
+
+# 🔥 SAFE SEO INJECTION (NO TEMPLATE ENGINE)
+def inject_seo(html, seo):
+    seo_script = f"""
+<script>
+window.SERVER_SEO = {json.dumps(seo)};
+</script>
+"""
+    return html.replace("</head>", seo_script + "\n</head>")
+
+
+# 🔥 ROOT (MODIFIED ONLY INTERNALLY)
 @app.route('/')
 def index():
-    return send_file('index.html')
+    seo = {
+        "title": "Download Instagram Reels Without Watermark (Free) | ReelSnag",
+        "heading": "Download Instagram Reels",
+        "subtitle": "Paste your reel link and download instantly",
+        "content": "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality."
+    }
+
+    with open("index.html", "r") as f:
+        html = f.read()
+
+    return inject_seo(html, seo)
 
 
-# 🔥 NEW: delayed cleanup
+# 🔥 PROGRAMMATIC SEO ROUTE (NEW)
+@app.route('/<slug>')
+def seo_page(slug):
+    seo = SEO_PAGES.get(slug)
+
+    if not seo:
+        seo = {
+            "title": f"{slug.replace('-', ' ').title()} | ReelSnag",
+            "heading": slug.replace('-', ' ').title(),
+            "subtitle": "Download Instagram reels instantly",
+            "content": f"Use ReelSnag to {slug.replace('-', ' ')} without watermark in HD."
+        }
+
+    with open("index.html", "r") as f:
+        html = f.read()
+
+    return inject_seo(html, seo)
+
+
+# 🔥 EXISTING CLEANUP (UNCHANGED)
 def delete_file_later(path):
-    time.sleep(2)  # small delay fixes your bug
+    time.sleep(2)
     try:
         if os.path.exists(path):
             os.remove(path)
@@ -29,6 +94,13 @@ def delete_file_later(path):
         pass
 
 
+# 🔥 TRACK (SAFE KEEP)
+@app.route('/track', methods=['POST'])
+def track():
+    return jsonify({"status": "ok"})
+
+
+# 🔥 DOWNLOAD (100% UNTOUCHED)
 @app.route('/download', methods=['POST'])
 def download():
     try:
@@ -67,7 +139,6 @@ def download():
         if not os.path.exists(file_path):
             return jsonify({'error': 'Download failed'}), 500
 
-        # 🔥 FIX: delayed deletion instead of immediate
         threading.Thread(target=delete_file_later, args=(file_path,)).start()
 
         return send_file(
