@@ -500,24 +500,24 @@ def track():
             'extra': data.get('extra', {})
         }
 
-        # Load, update, save
-        tracking = load_tracking_data()
-        tracking['events'].append(track_data)
+      tracking = load_tracking_data()
 
-        # Keep only last 10000 events
-        if len(tracking['events']) > 10000:
-            tracking['events'] = tracking['events'][-10000:]
+tracking.setdefault('events', [])
+tracking.setdefault('page_views', {})
+tracking.setdefault('downloads', 0)
 
-        # Track page views
-        page = track_data['page']
-        if page not in tracking['page_views']:
-            tracking['page_views'][page] = 0
-        tracking['page_views'][page] += 1
+tracking['events'].append(track_data)
 
-        # Track downloads
-        if track_data['event'] == 'download_success':
-            tracking['downloads'] = tracking.get('downloads', 0) + 1
+# Track page views ONLY for pageview event
+if track_data['event'] == 'pageview':
+page = track_data['page']
+if page not in tracking['page_views']:
+tracking['page_views'][page] = 0
+tracking['page_views'][page] += 1
 
+# Track downloads
+if track_data['event'] == 'download_success':
+tracking['downloads'] += 1
         save_tracking_data(tracking)
 
         logger.info(f"TRACK: {track_data['event']} on {track_data['page']}")
