@@ -825,6 +825,14 @@ async function handleDownload() {
     statusText.innerText = "Download complete!";
     statusText.classList.add('success');
     downloadBtn.innerText = "Downloaded!";
+    fetch('/track', {
+  method: 'POST',
+  headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({
+    event: 'download_success',
+    page: window.location.pathname
+  })
+}).catch(()=>{});
 
     // Track success
     trackEvent('download_success', window.location.pathname);
