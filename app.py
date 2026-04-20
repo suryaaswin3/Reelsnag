@@ -479,56 +479,54 @@ Sitemap: https://reelsnag.site/sitemap.xml
 # ---------------- TRACK ENDPOINT (ENHANCED) ----------------
 @app.route('/track', methods=['POST'])
 def track():
-try:
-data = request.get_json(force=True, silent=True) or {}
+    try:
+        data = request.get_json(force=True, silent=True) or {}
 
-# Get additional data from request
-user_agent = request.headers.get('User-Agent', 'unknown')
-referrer = request.headers.get('Referer', 'direct')
-device_type = get_device_type(user_agent)
+        # Get additional data from request
+        user_agent = request.headers.get('User-Agent', 'unknown')
+        referrer = request.headers.get('Referer', 'direct')
+        device_type = get_device_type(user_agent)
 
-track_data = {
-'event': data.get('event', 'pageview'),
-'page': data.get('page', request.path),
-'slug': data.get('page', request.path).lstrip('/'),
-'timestamp': datetime.now().isoformat(),
-'user_agent': user_agent,
-'device_type': device_type,
-'referrer': referrer,
-'ip': request.remote_addr,
-'success': data.get('success', True),
-'extra': data.get('extra', {})
-}
+        track_data = {
+            'event': data.get('event', 'pageview'),
+            'page': data.get('page', request.path),
+            'slug': data.get('page', request.path).lstrip('/'),
+            'timestamp': datetime.now().isoformat(),
+            'user_agent': user_agent,
+            'device_type': device_type,
+            'referrer': referrer,
+            'ip': request.remote_addr,
+            'success': data.get('success', True),
+            'extra': data.get('extra', {})
+        }
 
-tracking = load_tracking_data()
+        tracking = load_tracking_data()
 
-# Ensure structure exists
-tracking.setdefault('events', [])
-tracking.setdefault('page_views', {})
-tracking.setdefault('downloads', 0)
+        tracking.setdefault('events', [])
+        tracking.setdefault('page_views', {})
+        tracking.setdefault('downloads', 0)
 
-tracking['events'].append(track_data)
+        tracking['events'].append(track_data)
 
-# Track page views ONLY for pageview event
-if track_data['event'] == 'pageview':
-page = track_data['page']
-if page not in tracking['page_views']:
-tracking['page_views'][page] = 0
-tracking['page_views'][page] += 1
+        # Track page views ONLY for pageview
+        if track_data['event'] == 'pageview':
+            page = track_data['page']
+            if page not in tracking['page_views']:
+                tracking['page_views'][page] = 0
+            tracking['page_views'][page] += 1
 
-# Track downloads
-if track_data['event'] == 'download_success':
-tracking['downloads'] += 1
+        # Track downloads
+        if track_data['event'] == 'download_success':
+            tracking['downloads'] += 1
 
-save_tracking_data(tracking)
+        save_tracking_data(tracking)
 
-logger.info(f"TRACK: {track_data['event']} on {track_data['page']}")
-return jsonify({"ok": True})
+        logger.info(f"TRACK: {track_data['event']} on {track_data['page']}")
+        return jsonify({"ok": True})
 
-except Exception as e:
-logger.error(f"Track error: {e}")
-return jsonify({"ok": True})
-
+    except Exception as e:
+        logger.error(f"Track error: {e}")
+        return jsonify({"ok": True})
 
 # ---------------- STATS ENDPOINT ----------------
 @app.route('/stats')
