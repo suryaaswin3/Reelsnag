@@ -575,37 +575,39 @@ def download():
 
         tmp_dir = "/tmp/reelsnag" if os.name != 'nt' else os.path.join(os.environ.get('TEMP', '.'), 'reelsnag')
         os.makedirs(tmp_dir, exist_ok=True)
+
         file_id = str(uuid.uuid4())
         path = os.path.join(tmp_dir, file_id)
 
-        # Optimized yt-dlp options for faster extraction
         ydl_opts = {
             'outtmpl': path + '.%(ext)s',
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': False,
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'format': 'bv*+ba/best',
             'merge_output_format': 'mp4',
             'socket_timeout': 30,
             'retries': 2,
             'fragment_retries': 2,
-            'http_chunk_size': 10485760,  # 10MB chunks
         }
 
+        # ✅ DOWNLOAD
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            file_path = ydl.prepare_filename(info)
+            ydl.extract_info(url, download=True)
 
-        # Ensure .mp4 extension
-        if not file_path.endswith(".mp4"):
-            new_path = file_path.rsplit('.', 1)[0] + ".mp4"
-            if os.path.exists(file_path):
-                os.rename(file_path, new_path)
-                file_path = new_path
+        # ✅ FIND FILE (CORRECT INDENT)
+        file_path = None
+        for f in os.listdir(tmp_dir):
+            if f.startswith(file_id) and f.endswith(".mp4"):
+                file_path = os.path.join(tmp_dir, f)
+                break
 
-        # Schedule cleanup
+        # ✅ MUST CHECK
+        if not file_path:
+            raise Exception("Final video file not found")
+
+        # ✅ CLEANUP THREAD
         def cleanup():
-            time.sleep(300)  # 5 minutes
+            time.sleep(300)
             try:
                 if os.path.exists(file_path):
                     os.remove(file_path)
@@ -614,22 +616,17 @@ def download():
 
         threading.Thread(target=cleanup, daemon=True).start()
 
-        # Build response with explicit headers to prevent browser popup
-        res = send_file(
+        # ✅ SEND FILE (NO MANUAL HEADER OVERRIDE)
+        return send_file(
             file_path,
             as_attachment=True,
             download_name="reelsnag_download.mp4",
             mimetype="video/mp4"
         )
-        res.headers['Content-Disposition'] = 'attachment; filename="reelsnag_download.mp4"'
-        res.headers['X-Content-Type-Options'] = 'nosniff'
-        res.headers['X-Site-URL'] = request.host_url.rstrip('/')
-        return res
 
     except Exception as e:
         logger.error(f"Download error: {e}")
         return jsonify({"error": "Download failed. Please check the URL and try again."}), 500
-
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, threaded=True)
