@@ -618,7 +618,7 @@ def download():
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'format': 'bv*+ba/b',
             'merge_output_format': 'mp4',
             'socket_timeout': 30,
             'retries': 2,
@@ -631,12 +631,7 @@ def download():
             file_path = ydl.prepare_filename(info)
 
         # Ensure .mp4 extension
-        if not file_path.endswith(".mp4"):
-            new_path = file_path.rsplit('.', 1)[0] + ".mp4"
-            if os.path.exists(file_path):
-                os.rename(file_path, new_path)
-                file_path = new_path
-
+        
         # Schedule cleanup
         def cleanup():
             time.sleep(300)  # 5 minutes
@@ -648,7 +643,12 @@ def download():
 
         threading.Thread(target=cleanup, daemon=True).start()
 
-        res = send_file(file_path, as_attachment=True, download_name="reelsnag_download.mp4")
+        res = send_file(
+    file_path,
+    as_attachment=True,
+    download_name="reelsnag_download.mp4",
+    mimetype="video/mp4"
+)
         res.headers['X-Site-URL'] = request.host_url.rstrip('/')
         return res
 
