@@ -501,6 +501,14 @@ def track():
         }
 
         tracking = load_tracking_data()
+if not isinstance(tracking.get('page_views'), dict):
+    tracking['page_views'] = {}
+
+if not isinstance(tracking.get('events'), list):
+    tracking['events'] = []
+
+if not isinstance(tracking.get('downloads'), int):
+    tracking['downloads'] = 0
 
         tracking.setdefault('events', [])
         tracking.setdefault('page_views', {})
