@@ -410,28 +410,34 @@ def inject_seo_cached(html, slug):
         canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
 
        # Inject SEO data for frontend (SAFE - no duplication)
-script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
+@lru_cache(maxsize=100)
+def inject_seo_cached(html, slug):
+    try:
+        seo = get_seo_for_slug(slug)
+        canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
 
-if "window.SERVER_SEO" not in html and "</head>" in html:
-    html = html.replace("</head>", script + "\n</head>")
+        # 🔥 YOUR FIX GOES HERE (INSIDE TRY)
+        script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
 
-        # Safe title replacement with regex
+        if "window.SERVER_SEO" not in html and "</head>" in html:
+            html = html.replace("</head>", script + "\n</head>")
+
+        # other SEO replacements...
         try:
             html = re.sub(r"<title>.*?</title>", f"<title>{seo['title']}</title>", html, count=1)
-        except Exception:
+        except:
             pass
 
-        # Safe canonical replacement
         try:
             html = re.sub(r'<link rel="canonical".*?>', f'<link rel="canonical" href="{canonical}" />', html, count=1)
-        except Exception:
+        except:
             pass
 
         return html
+
     except Exception as e:
         logger.error(f"SEO injection error: {e}")
         return html
-
 # ---------------- ROUTES ----------------
 
 @app.route('/')
