@@ -476,6 +476,39 @@ Sitemap: https://reelsnag.site/sitemap.xml
 """
     return Response(content, mimetype='text/plain')
 
+@app.route('/privacy-policy')
+def privacy():
+    return """
+    <h1>Privacy Policy</h1>
+    <p>ReelSnag does not store personal data. We may collect anonymous usage data to improve the service.</p>
+    <p>We use cookies and analytics tools to understand user behavior.</p>
+    <p>By using this website, you agree to this policy.</p>
+    """
+
+@app.route('/terms')
+def terms():
+    return """
+    <h1>Terms & Conditions</h1>
+    <p>This tool is provided for personal use only.</p>
+    <p>Users are responsible for ensuring they have rights to download content.</p>
+    <p>ReelSnag is not responsible for misuse of this tool.</p>
+    """
+
+@app.route('/about')
+def about():
+    return """
+    <h1>About ReelSnag</h1>
+    <p>ReelSnag is a free tool to download Instagram reels without watermark in HD quality.</p>
+    <p>It is fast, secure, and works on all devices.</p>
+    """
+
+@app.route('/contact')
+def contact():
+    return """
+    <h1>Contact</h1>
+    <p>For inquiries, contact: reelsnag.site@email.com</p>
+    """
+
 # ---------------- TRACK ENDPOINT (ENHANCED) ----------------
 @app.route('/track', methods=['POST'])
 def track():
