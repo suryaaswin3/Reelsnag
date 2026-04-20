@@ -598,14 +598,14 @@ def download():
     ip = request.remote_addr or "unknown"
 
     if not check_rate_limit(ip):
-        return jsonify({"error": "Too many requests. Please wait a moment."}), 429
+        return jsonify({"error": "Too many requests"}), 429
 
     try:
         data = request.get_json(silent=True) or {}
         url = data.get("url", "").strip()
 
         if not url or "instagram.com" not in url:
-            return jsonify({"error": "Invalid Instagram URL"}), 400
+            return jsonify({"error": "Invalid URL"}), 400
 
         tmp_dir = "/tmp/reelsnag" if os.name != 'nt' else os.path.join(os.environ.get('TEMP', '.'), 'reelsnag')
         os.makedirs(tmp_dir, exist_ok=True)
@@ -617,48 +617,34 @@ def download():
             'outtmpl': path + '_%(id)s.%(ext)s',
             'quiet': True,
             'no_warnings': True,
-            'extract_flat': False,
             'format': 'bestvideo+bestaudio/best',
             'merge_output_format': 'mp4',
-            'socket_timeout': 30,
-            'retries': 2,
-            'fragment_retries': 2,
-            'http_chunk_size': 10485760,
         }
-        # 🔥 Find actual merged mp4 file
-       file_path = None
 
-       for f in os.listdir(tmp_dir):
-       if f.startswith(file_id) and f.endswith(".mp4"):
-        file_path = os.path.join(tmp_dir, f)
-        break
+        # ✅ DOWNLOAD FIRST
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.extract_info(url, download=True)
 
-       if not file_path:
-        raise Exception("Final merged video not found")
+        # ✅ THEN FIND FILE
+        file_path = None
+        for f in os.listdir(tmp_dir):
+            if f.startswith(file_id) and f.endswith(".mp4"):
+                file_path = os.path.join(tmp_dir, f)
+                break
 
-        # Cleanup thread
-        def cleanup():
-            time.sleep(300)
-            try:
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-            except Exception as e:
-                logger.error(f"Cleanup error: {e}")
+        if not file_path:
+            raise Exception("Final video not found")
 
-        threading.Thread(target=cleanup, daemon=True).start()
-
-        res = send_file(
+        return send_file(
             file_path,
             as_attachment=True,
             download_name="reelsnag_download.mp4",
             mimetype="video/mp4"
         )
-        res.headers['X-Site-URL'] = request.host_url.rstrip('/')
-        return res
 
-        except Exception as e:
-         logger.error(f"Download error: {e}")
-         return jsonify({"error": "Download failed. Please check the URL and try again."}), 500
+    except Exception as e:
+        logger.error(f"Download error: {e}")
+        return jsonify({"error": "Download failed"}), 500
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, threaded=True)
