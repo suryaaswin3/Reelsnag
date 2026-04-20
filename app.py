@@ -618,7 +618,7 @@ def download():
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
-            'format': 'bv*+ba/b',
+            'format': 'bestvideo+bestaudio/best',
             'merge_output_format': 'mp4',
             'socket_timeout': 30,
             'retries': 2,
@@ -629,6 +629,12 @@ def download():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info)
+
+# 🔥 FIX: ensure we send merged mp4
+if not file_path.endswith(".mp4"):
+    file_path = os.path.splitext(file_path)[0] + ".mp4"
+    if not os.path.exists(file_path):
+    raise Exception("Final video file not found")
 
         # Ensure .mp4 extension
         
