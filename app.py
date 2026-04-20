@@ -593,7 +593,7 @@ def stats():
     return jsonify(stats_data)
 
 # ---------------- DOWNLOAD ---------------
-       @app.route('/download', methods=['POST'])
+@app.route('/download', methods=['POST'])
 def download():
     ip = request.remote_addr or "unknown"
 
