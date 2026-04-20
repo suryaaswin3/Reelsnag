@@ -298,8 +298,12 @@
     }
 
     .btn:hover {
-      opacity: 0.9;
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(255,255,255,0.15),
+              0 0 24px rgba(255,255,255,0.08);
     }
+    
 
     .btn:disabled {
       opacity: 0.6;
@@ -750,8 +754,11 @@ function trackEvent(event, page, extra = {}) {
 
 // Main download handler
 async function handleDownload() {
-  const urlInput = document.getElementById("urlInput");
   const downloadBtn = document.getElementById("downloadBtn");
+
+  if (downloadBtn.classList.contains("loading")) return;
+
+  const urlInput = document.getElementById("urlInput");
   const status = document.getElementById("status");
   const statusText = document.getElementById("statusText");
   const progressBar = document.getElementById("progressBar");
@@ -798,6 +805,8 @@ async function handleDownload() {
 
   downloadBtn.innerText = "Processing...";
   downloadBtn.disabled = true;
+  downloadBtn.classList.add("loading");
+  
 
   // Track attempt
   trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
@@ -843,6 +852,7 @@ async function handleDownload() {
     statusText.innerText = "Download complete!";
     statusText.classList.add('success');
     downloadBtn.innerText = "Downloaded!";
+    urlInput.value = ""; // 👈 AUTO CLEAR
     fetch('/track', {
   method: 'POST',
   headers: {'Content-Type':'application/json'},
@@ -877,6 +887,7 @@ async function handleDownload() {
   setTimeout(() => {
     downloadBtn.innerText = "Download Now (HD, No Watermark)";
     downloadBtn.disabled = false;
+    downloadBtn.classList.remove("loading");
     progressBar.style.width = "0%";
     status.classList.remove("show");
     statusText.classList.remove('success', 'error');
