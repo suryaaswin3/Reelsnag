@@ -43,7 +43,7 @@
   }
   </script>
 
-  <!-- FAQ Schema (dynamically populated) -->
+  <!-- FAQ Schema -->
   <script type="application/ld+json" id="faq-schema">
   {
     "@context": "https://schema.org",
@@ -59,22 +59,26 @@
   }
   </script>
 
-  <!-- Dynamic SEO -->
+  <!-- 🔥 FIXED Dynamic SEO -->
   <script>
   (function() {
     const path = window.location.pathname;
     const slug = path.replace(/^\//, '').replace(/\/$/, '');
 
-    let config = window.SERVER_SEO || {
-      title: "Download Instagram Reels Without Watermark (Free) | ReelSnag",
-      description: "Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader.",
-      heading: "Download Instagram Reels",
-      subtitle: "Paste your reel link and download instantly",
-      content: "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality. Works instantly on all devices."
-    };
+    let config;
 
-    // Client-side fallback for SEO pages (if server didn't inject)
-    if (!window.SERVER_SEO && slug) {
+    // ✅ PRIORITY: backend SEO
+    if (window.SERVER_SEO && Object.keys(window.SERVER_SEO).length > 0) {
+      config = window.SERVER_SEO;
+    } else {
+      config = {
+        title: "Download Instagram Reels Without Watermark (Free) | ReelSnag",
+        description: "Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader.",
+        heading: "Download Instagram Reels",
+        subtitle: "Paste your reel link and download instantly",
+        content: "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality. Works instantly on all devices."
+      };
+
       const seoMap = {
         "download-instagram-reels": {
           title: "Download Instagram Reels Free HD | ReelSnag",
@@ -96,48 +100,47 @@
         },
         "hd-reels-downloader": {
           title: "HD Reels Downloader - Download Instagram in High Quality | ReelSnag",
-          description: "Download Instagram reels in HD quality. High definition reel downloader.",
+          description: "Download Instagram reels in HD quality.",
           heading: "HD Reels Downloader",
           subtitle: "Download in full HD quality"
         },
         "no-watermark-reels": {
           title: "Download Reels Without Watermark | ReelSnag",
-          description: "Download Instagram reels without watermark. Clean videos with no logo.",
+          description: "Download Instagram reels without watermark.",
           heading: "No Watermark Reels",
           subtitle: "Clean downloads, zero branding"
         },
         "free-reels-downloader": {
           title: "Free Reels Downloader - Unlimited Downloads | ReelSnag",
-          description: "Free reels downloader with unlimited downloads. No subscription.",
+          description: "Free reels downloader with unlimited downloads.",
           heading: "Free Reels Downloader",
           subtitle: "Unlimited, no subscription"
         },
         "reels-downloader-android": {
-          title: "Reels Downloader for Android - Download Instagram Reels | ReelSnag",
-          description: "Reels downloader for Android phones. Download on any Android device.",
+          title: "Reels Downloader for Android | ReelSnag",
+          description: "Download reels on Android devices.",
           heading: "Reels Downloader for Android",
           subtitle: "Works on all Android devices"
         },
         "reels-downloader-iphone": {
-          title: "Reels Downloader for iPhone - Download Instagram Reels iOS | ReelSnag",
-          description: "Reels downloader for iPhone and iPad. Download on iOS without apps.",
+          title: "Reels Downloader for iPhone | ReelSnag",
+          description: "Download reels on iOS devices.",
           heading: "Reels Downloader for iPhone",
           subtitle: "Works on iOS without apps"
         },
         "download-instagram-reels-india": {
           title: "Download Instagram Reels India | ReelSnag",
-          description: "Download Instagram reels in India without watermark. Fast for Jio & Airtel.",
+          description: "Fast downloads for India users.",
           heading: "Download Instagram Reels India",
           subtitle: "Fast for Jio & Airtel users"
         }
       };
 
-      if (seoMap[slug]) {
+      if (slug && seoMap[slug]) {
         config = seoMap[slug];
       }
     }
 
-    // Apply SEO config
     if (!document.title || document.title.includes("ReelSnag")) {
       document.title = config.title;
     }
