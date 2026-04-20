@@ -614,13 +614,15 @@ def download():
         path = os.path.join(tmp_dir, file_id)
 
         ydl_opts = {
-            'outtmpl': path + '.%(ext)s',
-            'quiet': True,
-            'no_warnings': True,
-            'format': 'best[ext=mp4]/best',
-            'noplaylist': True,
-        }
+    'outtmpl': path + '.%(ext)s',
+    'quiet': True,
+    'no_warnings': True,
+    'format': 'best[ext=mp4]/best',
+    'noplaylist': True,
+    'cookiefile': 'cookies.txt',  # 🔥 ADD THIS
+}
 
+       
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info)
