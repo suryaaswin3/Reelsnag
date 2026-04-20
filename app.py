@@ -600,7 +600,7 @@ def download():
     if not check_rate_limit(ip):
         return jsonify({"error": "Too many requests. Please wait a moment."}), 429
 
-    try:
+try:
         data = request.get_json(silent=True) or {}
         url = data.get("url", "").strip()
 
@@ -631,7 +631,7 @@ def download():
             file_path = ydl.prepare_filename(info)
 
 # 🔥 FIX: ensure we send merged mp4
-if not file_path.endswith(".mp4"):
+    if not file_path.endswith(".mp4"):
     file_path = os.path.splitext(file_path)[0] + ".mp4"
     if not os.path.exists(file_path):
     raise Exception("Final video file not found")
