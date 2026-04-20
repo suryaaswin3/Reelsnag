@@ -592,8 +592,8 @@ def stats():
 
     return jsonify(stats_data)
 
-# ---------------- DOWNLOAD ----------------
-@app.route('/download', methods=['POST'])
+# ---------------- DOWNLOAD ---------------
+       @app.route('/download', methods=['POST'])
 def download():
     ip = request.remote_addr or "unknown"
 
@@ -617,7 +617,8 @@ def download():
             'outtmpl': path + '.%(ext)s',
             'quiet': True,
             'no_warnings': True,
-            'format': 'best',
+            'format': 'best[ext=mp4]/best',
+            'noplaylist': True,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -627,7 +628,8 @@ def download():
         return send_file(
             file_path,
             as_attachment=True,
-            download_name="reelsnag_download.mp4"
+            download_name="reelsnag_download.mp4",
+            mimetype="video/mp4"
         )
 
     except Exception as e:
