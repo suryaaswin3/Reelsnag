@@ -59,7 +59,7 @@
   }
   </script>
 
-  <!-- 🔥 FIXED Dynamic SEO -->
+  <!-- Dynamic SEO Engine -->
   <script>
   (function() {
     const path = window.location.pathname;
@@ -67,78 +67,12 @@
 
     let config;
 
-    // ✅ PRIORITY: backend SEO
+    // PRIORITY: backend SEO
     if (window.SERVER_SEO && Object.keys(window.SERVER_SEO).length > 0) {
       config = window.SERVER_SEO;
     } else {
-      config = {
-        title: "Download Instagram Reels Without Watermark (Free) | ReelSnag",
-        description: "Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader.",
-        heading: "Download Instagram Reels",
-        subtitle: "Paste your reel link and download instantly",
-        content: "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality. Works instantly on all devices."
-      };
-
-      const seoMap = {
-        "download-instagram-reels": {
-          title: "Download Instagram Reels Free HD | ReelSnag",
-          description: "Download Instagram reels free in HD with no watermark using ReelSnag.",
-          heading: "Download Instagram Reels",
-          subtitle: "Free HD reel downloader online"
-        },
-        "reels-downloader": {
-          title: "Best Reels Downloader Online | ReelSnag",
-          description: "Best reels downloader to save Instagram videos instantly without watermark.",
-          heading: "Reels Downloader",
-          subtitle: "Fast and free reel downloader"
-        },
-        "instagram-reel-downloader": {
-          title: "Instagram Reel Downloader Without Watermark HD | ReelSnag",
-          description: "Download Instagram reels without watermark in HD quality using ReelSnag.",
-          heading: "Instagram Reel Downloader",
-          subtitle: "Download reels without watermark in HD"
-        },
-        "hd-reels-downloader": {
-          title: "HD Reels Downloader - Download Instagram in High Quality | ReelSnag",
-          description: "Download Instagram reels in HD quality.",
-          heading: "HD Reels Downloader",
-          subtitle: "Download in full HD quality"
-        },
-        "no-watermark-reels": {
-          title: "Download Reels Without Watermark | ReelSnag",
-          description: "Download Instagram reels without watermark.",
-          heading: "No Watermark Reels",
-          subtitle: "Clean downloads, zero branding"
-        },
-        "free-reels-downloader": {
-          title: "Free Reels Downloader - Unlimited Downloads | ReelSnag",
-          description: "Free reels downloader with unlimited downloads.",
-          heading: "Free Reels Downloader",
-          subtitle: "Unlimited, no subscription"
-        },
-        "reels-downloader-android": {
-          title: "Reels Downloader for Android | ReelSnag",
-          description: "Download reels on Android devices.",
-          heading: "Reels Downloader for Android",
-          subtitle: "Works on all Android devices"
-        },
-        "reels-downloader-iphone": {
-          title: "Reels Downloader for iPhone | ReelSnag",
-          description: "Download reels on iOS devices.",
-          heading: "Reels Downloader for iPhone",
-          subtitle: "Works on iOS without apps"
-        },
-        "download-instagram-reels-india": {
-          title: "Download Instagram Reels India | ReelSnag",
-          description: "Fast downloads for India users.",
-          heading: "Download Instagram Reels India",
-          subtitle: "Fast for Jio & Airtel users"
-        }
-      };
-
-      if (slug && seoMap[slug]) {
-        config = seoMap[slug];
-      }
+      // Fallback: generate dynamically
+      config = generateDynamicSEO(slug);
     }
 
     if (!document.title || document.title.includes("ReelSnag")) {
@@ -148,6 +82,67 @@
     window.dynamicSEO = config;
     window.currentSlug = slug;
   })();
+
+  // Generate dynamic SEO for any slug
+  function generateDynamicSEO(slug) {
+    const defaultConfig = {
+      title: "Download Instagram Reels Without Watermark (Free) | ReelSnag",
+      description: "Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader.",
+      heading: "Download Instagram Reels",
+      subtitle: "Paste your reel link and download instantly",
+      content: "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality."
+    };
+
+    if (!slug) return defaultConfig;
+
+    const slugLower = slug.toLowerCase();
+    const titleCase = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+    // Intent detection
+    const intents = {
+      quality: /hd|4k|ultra|high.quality|full.hd|1080p|720p/.test(slugLower),
+      noWatermark: /no.watermark|without.watermark|clean|no.branding/.test(slugLower),
+      free: /free|unlimited|no.subscription/.test(slugLower),
+      speed: /fast|instant|quick|speed|lightning|rapid/.test(slugLower),
+      india: /india|indian|jio|airtel|vi|mumbai|delhi/.test(slugLower),
+      android: /android|samsung|pixel|oneplus|xiaomi/.test(slugLower),
+      ios: /iphone|ipad|ios|apple/.test(slugLower),
+      pc: /pc|windows|mac|desktop|laptop/.test(slugLower)
+    };
+
+    // Build title
+    let title = titleCase;
+    if (intents.quality) title += " - HD Quality";
+    if (intents.noWatermark) title += " Without Watermark";
+    if (intents.free) title += " (Free)";
+    title += " | ReelSnag";
+
+    // Build description
+    let desc = `Download ${titleCase}`;
+    if (intents.quality) desc += " in HD quality";
+    if (intents.noWatermark) desc += " without watermark";
+    if (intents.india) desc += " - optimized for India users on Jio and Airtel";
+    if (intents.android) desc += " on Android devices";
+    if (intents.ios) desc += " on iPhone and iPad";
+    if (intents.speed) desc += " instantly";
+    desc += ". Free tool by ReelSnag.";
+
+    // Build subtitle
+    const subtitleParts = [];
+    if (intents.free) subtitleParts.push("Free");
+    if (intents.speed) subtitleParts.push("Fast");
+    if (intents.quality) subtitleParts.push("HD Quality");
+    if (intents.noWatermark) subtitleParts.push("No Watermark");
+    const subtitle = subtitleParts.length ? subtitleParts.join(", ") + " Downloads" : "Download instantly";
+
+    return {
+      title: title.trim(),
+      description: desc.trim(),
+      heading: titleCase,
+      subtitle: subtitle,
+      content: `Download ${titleCase} with ReelSnag. ${intents.quality ? 'High-quality HD downloads. ' : ''}${intents.noWatermark ? 'Clean downloads without watermark. ' : ''}${intents.speed ? 'Lightning-fast processing. ' : ''}${intents.india ? 'Optimized for India. ' : ''}Free, no signup required.`
+    };
+  }
   </script>
 
   <!-- Google Analytics -->
@@ -298,19 +293,14 @@
     }
 
     .btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 0 12px rgba(255,255,255,0.15),
-              0 0 24px rgba(255,255,255,0.08);
+      opacity: 0.9;
     }
-    
 
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    /* Trust signals */
     .trust-signals {
       display: flex;
       justify-content: center;
@@ -355,14 +345,6 @@
       width: 0%;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       transition: width 0.3s;
-    }
-    /* your existing styles above */
-
-    .btn.loading {
-      opacity: 0.7;
-      pointer-events: none;
-      cursor: not-allowed;
-      transition: all 0.2s ease;
     }
 
     /* SEO Content Sections */
@@ -447,7 +429,44 @@
       line-height: 1.6;
     }
 
-    /* Related Pages */
+    /* Popular Pages - Internal Linking */
+    .popular-pages {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .popular-pages h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .popular-pages ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .popular-pages a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .popular-pages a:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* Related Pages - Dynamic based on slug */
     .related-pages {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -465,7 +484,7 @@
     .related-pages ul {
       list-style: none;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 0.5rem;
     }
 
@@ -488,6 +507,24 @@
     .seo-keywords {
       display: none;
     }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 560px;
+      padding: 0 1rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -509,10 +546,6 @@
       <button class="paste-btn" onclick="pasteFromClipboard()" title="Paste from clipboard">Paste</button>
     </div>
 
-    <p style="font-size:0.8rem; color:#aaa; text-align:center; margin:12px 0 8px;">
-⚡ Works instantly • No watermark • No login
-</p>
-    
     <button class="btn" id="downloadBtn" onclick="handleDownload()">
       Download Now (HD, No Watermark)
     </button>
@@ -534,8 +567,12 @@
 
 </div>
 
+<!-- Breadcrumb -->
+<div id="breadcrumb" class="breadcrumb"></div>
+
 <!-- SEO Content Anchor -->
 <div id="seoContentWrapper" class="seo-content-wrapper">
+  <div id="popularPages"></div>
   <div id="seoContent"></div>
   <div id="relatedPages"></div>
 </div>
@@ -544,13 +581,46 @@
 <div class="seo-keywords">
   instagram reel downloader, download reels without watermark, reels downloader hd, instagram video download tool,
   save instagram reels, instagram video saver, hd reels download, free reels downloader, fast reels downloader,
-  mobile reels downloader, reels downloader android, reels downloader iphone, reels downloader pc
+  mobile reels downloader, reels downloader android, reels downloader iphone, reels downloader pc, 4k reels,
+  instant reels, reels downloader india, jio reels, airtel reels
 </div>
 
 <script>
+// All SEO pages for internal linking
+const ALL_SEO_PAGES = [
+  { slug: '', label: 'Home' },
+  { slug: 'download-instagram-reels', label: 'Download Instagram Reels' },
+  { slug: 'reels-downloader', label: 'Reels Downloader' },
+  { slug: 'instagram-reel-downloader', label: 'Instagram Reel Downloader' },
+  { slug: 'hd-reels-downloader', label: 'HD Reels Downloader' },
+  { slug: '4k-reels', label: '4K Reels' },
+  { slug: 'no-watermark-reels', label: 'No Watermark Reels' },
+  { slug: 'free-reels-downloader', label: 'Free Reels Downloader' },
+  { slug: 'fast-reels', label: 'Fast Reels' },
+  { slug: 'instant-reels', label: 'Instant Reels' },
+  { slug: 'reels-downloader-android', label: 'Reels for Android' },
+  { slug: 'reels-downloader-iphone', label: 'Reels for iPhone' },
+  { slug: 'reels-downloader-pc', label: 'Reels for PC' },
+  { slug: 'download-instagram-reels-india', label: 'Reels India' },
+  { slug: 'reels-downloader-jio', label: 'Jio Reels' },
+  { slug: 'reels-downloader-airtel', label: 'Airtel Reels' }
+];
+
+// Keyword mapping for related pages
+const KEYWORD_GROUPS = {
+  quality: ['hd-reels-downloader', '4k-reels', 'full-hd-reels', '1080p-reels'],
+  speed: ['fast-reels', 'instant-reels', 'quick-reels', 'rapid-reels'],
+  device: ['reels-downloader-android', 'reels-downloader-iphone', 'reels-downloader-pc'],
+  geo: ['download-instagram-reels-india', 'reels-downloader-jio', 'reels-downloader-airtel'],
+  feature: ['no-watermark-reels', 'free-reels-downloader', 'unlimited-reels']
+};
+
 // Initialize page on load
 window.onload = function() {
-  
+  // Restore last URL
+  const lastUrl = localStorage.getItem("lastReelUrl");
+  if (lastUrl) document.getElementById("urlInput").value = lastUrl;
+
   // Apply SEO content
   if (window.dynamicSEO) {
     document.getElementById("mainHeading").innerText = dynamicSEO.heading;
@@ -568,16 +638,104 @@ window.onload = function() {
     if (ogTitle) ogTitle.setAttribute('content', dynamicSEO.title);
     if (ogDesc) ogDesc.setAttribute('content', dynamicSEO.description);
 
+    // Generate breadcrumb
+    generateBreadcrumb();
+
+    // Generate popular pages (shown on all pages)
+    generatePopularPages();
+
+    // Generate related pages based on current slug
+    generateRelatedPages();
+
     // Generate SEO content sections
     generateSeoContent();
-
-    // Generate related pages
-    generateRelatedPages();
 
     // Track page view
     trackEvent('pageview', window.location.pathname);
   }
 };
+
+// Generate breadcrumb
+function generateBreadcrumb() {
+  const container = document.getElementById('breadcrumb');
+  if (!container) return;
+
+  const slug = window.currentSlug || '';
+  const parts = slug ? slug.split('-') : [];
+
+  let html = '<a href="/">Home</a>';
+  if (slug) {
+    html += ` &gt; <span>${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// Generate popular pages (5-8 links, shown on all pages)
+function generatePopularPages() {
+  const container = document.getElementById('popularPages');
+  if (!container) return;
+
+  const currentSlug = window.currentSlug || '';
+  // Show top pages, exclude current
+  const popular = ALL_SEO_PAGES
+    .filter(p => p.slug !== currentSlug && p.slug !== '')
+    .slice(0, 7);
+
+  if (popular.length === 0) return;
+
+  container.innerHTML = `
+    <div class="popular-pages">
+      <h3>Popular Pages</h3>
+      <ul>
+        ${popular.map(p => `<li><a href="/${p.slug}">${p.label}</a></li>`).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+// Generate related pages based on slug keywords
+function generateRelatedPages() {
+  const container = document.getElementById('relatedPages');
+  if (!container) return;
+
+  const slug = window.currentSlug || '';
+  if (!slug) return; // Don't show on home
+
+  const slugLower = slug.toLowerCase();
+  let related = [];
+
+  // Find matching keyword group
+  for (const [group, pages] of Object.entries(KEYWORD_GROUPS)) {
+    if (pages.some(p => slugLower.includes(p.split('-')[0]))) {
+      related = pages.filter(p => p !== slug);
+      break;
+    }
+  }
+
+  // Fallback: random selection
+  if (related.length === 0) {
+    related = ALL_SEO_PAGES
+      .filter(p => p.slug && p.slug !== slug)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 6);
+  }
+
+  if (related.length === 0) return;
+
+  container.innerHTML = `
+    <div class="related-pages">
+      <h3>Related Pages</h3>
+      <ul>
+        ${related.map(p => {
+          const label = typeof p === 'string' ? p.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : p.label;
+          const slugVal = typeof p === 'string' ? p : p.slug;
+          return `<li><a href="/${slugVal}">${label}</a></li>`;
+        }).join('')}
+      </ul>
+    </div>
+  `;
+}
 
 // Generate SEO content sections
 function generateSeoContent() {
@@ -585,10 +743,43 @@ function generateSeoContent() {
   if (!contentDiv) return;
 
   const heading = dynamicSEO.heading || 'Download Instagram Reels';
+  const slug = window.currentSlug || '';
+
+  // Detect intents for customized content
+  const slugLower = slug.toLowerCase();
+  const intents = {
+    quality: /hd|4k|ultra|high.quality|full.hd|1080p/.test(slugLower),
+    noWatermark: /no.watermark|without.watermark|clean/.test(slugLower),
+    speed: /fast|instant|quick|rapid/.test(slugLower),
+    india: /india|jio|airtel/.test(slugLower),
+    android: /android/.test(slugLower),
+    ios: /iphone|ipad|ios/.test(slugLower)
+  };
+
+  let qualityText = '';
+  if (intents.quality) {
+    qualityText = `
+      <h3>HD Quality Downloads</h3>
+      <p>Get your reels in the highest quality available, up to 4K resolution when available. No compression, no quality loss.</p>
+    `;
+  }
+
+  let deviceText = '';
+  if (intents.android) {
+    deviceText = `
+      <h3>Works on All Android Devices</h3>
+      <p>Compatible with Samsung, OnePlus, Xiaomi, Pixel, and all Android phones. Works in Chrome, Firefox, and any browser.</p>
+    `;
+  } else if (intents.ios) {
+    deviceText = `
+      <h3>Works on iPhone and iPad</h3>
+      <p>Download reels directly in Safari without installing any app. Compatible with all iOS devices running iOS 12 or later.</p>
+    `;
+  }
 
   contentDiv.innerHTML = `
     <div class="seo-sections">
-      <h3>How to Download Instagram Reels</h3>
+      <h3>How to ${heading}</h3>
       <ol>
         <li>Copy the Instagram reel link you want to download</li>
         <li>Paste it into the input box above</li>
@@ -605,6 +796,8 @@ function generateSeoContent() {
         <li><strong>Mac:</strong> macOS 10.14+, Safari/Chrome/Firefox</li>
         <li><strong>Linux:</strong> All distributions with modern browsers</li>
       </ul>
+
+      ${qualityText}
 
       <h3>Supported Formats</h3>
       <p>We download reels in the best available quality:</p>
@@ -660,65 +853,19 @@ function generateSeoContent() {
   `;
 }
 
-// Generate related pages for internal linking
-function generateRelatedPages() {
-  const relatedDiv = document.getElementById('relatedPages');
-  if (!relatedDiv) return;
-
-  const pages = [
-    { slug: 'download-instagram-reels', label: 'Download Instagram Reels' },
-    { slug: 'reels-downloader', label: 'Reels Downloader' },
-    { slug: 'instagram-reel-downloader', label: 'Instagram Reel Downloader' },
-    { slug: 'hd-reels-downloader', label: 'HD Reels Downloader' },
-    { slug: 'no-watermark-reels', label: 'No Watermark Reels' },
-    { slug: 'free-reels-downloader', label: 'Free Reels Downloader' },
-    { slug: 'reels-downloader-android', label: 'Reels for Android' },
-    { slug: 'reels-downloader-iphone', label: 'Reels for iPhone' },
-    { slug: 'download-instagram-reels-india', label: 'Download Reels India' },
-  ];
-
-  // Filter out current page
-  const currentSlug = window.currentSlug || '';
-  const filtered = pages.filter(p => p.slug !== currentSlug).slice(0, 6);
-
-  if (filtered.length === 0) return;
-
-  relatedDiv.innerHTML = `
-    <div class="related-pages">
-      <h3>Popular Pages</h3>
-      <ul>
-        ${filtered.map(p => `<li><a href="/${p.slug}">${p.label}</a></li>`).join('')}
-      </ul>
-    </div>
-  `;
-}
-
-async function pasteFromClipboard() {
-  try {
-    const text = await navigator.clipboard.readText();
+// Paste from clipboard
+function pasteFromClipboard() {
+  navigator.clipboard.readText().then(text => {
     const input = document.getElementById('urlInput');
-
-    // ✅ FIX: force refresh so paste works multiple times
-    input.value = '';
-    setTimeout(() => {
-      input.value = text.trim();
-    }, 50);
-
+    input.value = text.trim();
     input.classList.add('success');
     setTimeout(() => input.classList.remove('success'), 1000);
-
-  } catch (err) {
+  }).catch(() => {
     const text = prompt('Paste your Instagram reel link:');
     if (text) {
-      const input = document.getElementById('urlInput');
-
-      // ✅ same fix in fallback
-      input.value = '';
-      setTimeout(() => {
-        input.value = text.trim();
-      }, 50);
+      document.getElementById('urlInput').value = text.trim();
     }
-  }
+  });
 }
 
 // Validate Instagram URL
@@ -737,7 +884,7 @@ function isValidInstagramUrl(url) {
   }
 }
 
-// Track events
+// Track events with enhanced data
 function trackEvent(event, page, extra = {}) {
   fetch('/track', {
     method: 'POST',
@@ -747,6 +894,7 @@ function trackEvent(event, page, extra = {}) {
       page: page || window.location.pathname,
       path: window.location.pathname,
       timestamp: Date.now(),
+      referrer: document.referrer || 'direct',
       ...extra
     })
   }).catch(() => {});
@@ -754,11 +902,8 @@ function trackEvent(event, page, extra = {}) {
 
 // Main download handler
 async function handleDownload() {
-  const downloadBtn = document.getElementById("downloadBtn");
-
-  if (downloadBtn.classList.contains("loading")) return;
-
   const urlInput = document.getElementById("urlInput");
+  const downloadBtn = document.getElementById("downloadBtn");
   const status = document.getElementById("status");
   const statusText = document.getElementById("statusText");
   const progressBar = document.getElementById("progressBar");
@@ -796,6 +941,8 @@ async function handleDownload() {
   urlInput.classList.add('success');
   setTimeout(() => urlInput.classList.remove('success'), 1000);
 
+  // Save to localStorage
+  localStorage.setItem("lastReelUrl", url);
 
   // Show progress
   status.classList.add("show");
@@ -805,8 +952,6 @@ async function handleDownload() {
 
   downloadBtn.innerText = "Processing...";
   downloadBtn.disabled = true;
-  downloadBtn.classList.add("loading");
-  
 
   // Track attempt
   trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
@@ -829,12 +974,9 @@ async function handleDownload() {
 
     progressBar.style.width = "90%";
 
-    // Small delay for UX
-    await new Promise(r => setTimeout(r, 500));
-
+    // Trigger download immediately (preserves user gesture chain)
     progressBar.style.width = "100%";
 
-    // Create download
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
@@ -843,24 +985,16 @@ async function handleDownload() {
     document.body.appendChild(a);
     a.click();
 
+    // Cleanup after download starts
     setTimeout(() => {
       URL.revokeObjectURL(objectUrl);
       a.remove();
-    }, 1500);
+    }, 100);
 
     // Success state
     statusText.innerText = "Download complete!";
     statusText.classList.add('success');
     downloadBtn.innerText = "Downloaded!";
-    urlInput.value = ""; // 👈 AUTO CLEAR
-    fetch('/track', {
-  method: 'POST',
-  headers: {'Content-Type':'application/json'},
-  body: JSON.stringify({
-    event: 'download_success',
-    page: window.location.pathname
-  })
-}).catch(()=>{});
 
     // Track success
     trackEvent('download_success', window.location.pathname);
@@ -887,7 +1021,6 @@ async function handleDownload() {
   setTimeout(() => {
     downloadBtn.innerText = "Download Now (HD, No Watermark)";
     downloadBtn.disabled = false;
-    downloadBtn.classList.remove("loading");
     progressBar.style.width = "0%";
     status.classList.remove("show");
     statusText.classList.remove('success', 'error');
