@@ -910,19 +910,54 @@ async function handleDownload() {
 
   const url = urlInput.value.trim();
 
-  // Validation
   if (!url) {
-    urlInput.classList.add('error');
-    status.classList.add("show");
-    statusText.innerText = "Please paste an Instagram reel link";
-    statusText.classList.add('error');
-    setTimeout(() => {
-      urlInput.classList.remove('error');
-      statusText.classList.remove('error');
-    }, 3000);
-    trackEvent('download_error', window.location.pathname, { reason: 'empty_url' });
+    alert("Paste a URL");
     return;
   }
+
+  downloadBtn.disabled = true;
+  status.classList.add("show");
+  statusText.innerText = "Processing...";
+  progressBar.style.width = "30%";
+
+  try {
+    const res = await fetch('/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+
+    if (!res.ok) throw new Error("Server error");
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('video')) {
+      const text = await res.text();
+      throw new Error(text || "Invalid response");
+    }
+
+    const blob = await res.blob();
+    progressBar.style.width = "100%";
+
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = "reelsnag_" + Date.now() + ".mp4";
+
+    document.body.appendChild(a);
+    a.click();
+
+    URL.revokeObjectURL(objectUrl);
+    a.remove();
+
+    statusText.innerText = "Download complete";
+
+  } catch (err) {
+    statusText.innerText = err.message;
+  } finally {
+    downloadBtn.disabled = false;
+    progressBar.style.width = "0%";
+  }
+}
 
   if (!isValidInstagramUrl(url)) {
     urlInput.classList.add('error');
