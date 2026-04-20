@@ -991,6 +991,12 @@ async function handleDownload() {
 
     // Success
     statusText.innerText = "Download complete!";
+    if (typeof gtag === 'function') {
+      
+  gtag('event', 'conversion', {
+    'send_to': 'AW-18095042931/IY3NCPONjp0cEPPisbRD'
+  });
+}
     statusText.classList.add('success');
     downloadBtn.innerText = "Downloaded!";
 
