@@ -16,7 +16,7 @@ def add_headers(response):
     return response
 
 
-# 🔥 SEO CONFIG (SAFE ADD)
+# 🔥 SEO CONFIG
 SEO_PAGES = {
     "download-instagram-reels": {
         "title": "Download Instagram Reels Free HD | ReelSnag",
@@ -39,17 +39,33 @@ SEO_PAGES = {
 }
 
 
-# 🔥 SAFE SEO INJECTION (NO TEMPLATE ENGINE)
-def inject_seo(html, seo):
+# 🔥 CORE SEO INJECTION (SYNCED WITH FRONTEND)
+def inject_seo(html, seo, slug=""):
+    # Inject JS SEO object
     seo_script = f"""
 <script>
 window.SERVER_SEO = {json.dumps(seo)};
 </script>
 """
-    return html.replace("</head>", seo_script + "\n</head>")
+    html = html.replace("</head>", seo_script + "\n</head>")
+
+    # Replace TITLE (server-side SEO)
+    html = html.replace(
+        "<title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>",
+        f"<title>{seo['title']}</title>"
+    )
+
+    # Replace CANONICAL
+    canonical_url = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
+    html = html.replace(
+        '<link rel="canonical" href="https://reelsnag.site/" />',
+        f'<link rel="canonical" href="{canonical_url}" />'
+    )
+
+    return html
 
 
-# 🔥 ROOT (MODIFIED ONLY INTERNALLY)
+# 🔥 HOME ROUTE
 @app.route('/')
 def index():
     seo = {
@@ -65,7 +81,7 @@ def index():
     return inject_seo(html, seo)
 
 
-# 🔥 PROGRAMMATIC SEO ROUTE (NEW)
+# 🔥 PROGRAMMATIC SEO ROUTE
 @app.route('/<slug>')
 def seo_page(slug):
     seo = SEO_PAGES.get(slug)
@@ -81,10 +97,10 @@ def seo_page(slug):
     with open("index.html", "r") as f:
         html = f.read()
 
-    return inject_seo(html, seo)
+    return inject_seo(html, seo, slug)
 
 
-# 🔥 EXISTING CLEANUP (UNCHANGED)
+# 🔥 FILE CLEANUP (UNCHANGED)
 def delete_file_later(path):
     time.sleep(2)
     try:
@@ -94,13 +110,13 @@ def delete_file_later(path):
         pass
 
 
-# 🔥 TRACK (SAFE KEEP)
+# 🔥 TRACKING (SYNCED WITH FRONTEND)
 @app.route('/track', methods=['POST'])
 def track():
     return jsonify({"status": "ok"})
 
 
-# 🔥 DOWNLOAD (100% UNTOUCHED)
+# 🔥 DOWNLOAD (UNCHANGED — DO NOT TOUCH)
 @app.route('/download', methods=['POST'])
 def download():
     try:
