@@ -6,9 +6,10 @@ import time
 import threading
 import json
 import logging
+import re
 from urllib.parse import urlparse
 from functools import lru_cache
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # ---------------- LOGGING ----------------
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -64,7 +65,7 @@ SEO_PAGES = {
     }
 }
 
-# ---------------- SEO INJECTION ----------------
+# ---------------- SEO INJECTION (FIXED) ----------------
 @lru_cache(maxsize=50)
 def inject_seo_cached(html, slug):
     try:
@@ -81,20 +82,24 @@ def inject_seo_cached(html, slug):
 
         canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
 
-        # Inject script
+        # ✅ Inject SEO data for frontend
         script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
-        html = html.replace("</head>", script + "</head>")
+        html = html.replace("</head>", script + "\n</head>")
 
-        # Replace title
-        html = html.replace(
-            "<title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>",
-            f"<title>{seo['title']}</title>"
+        # ✅ SAFE TITLE REPLACEMENT (NO CRASH)
+        html = re.sub(
+            r"<title>.*?</title>",
+            f"<title>{seo['title']}</title>",
+            html,
+            count=1
         )
 
-        # Replace canonical
-        html = html.replace(
-            '<link rel="canonical" href="https://reelsnag.site/" />',
-            f'<link rel="canonical" href="{canonical}" />'
+        # ✅ SAFE CANONICAL REPLACEMENT
+        html = re.sub(
+            r'<link rel="canonical".*?>',
+            f'<link rel="canonical" href="{canonical}" />',
+            html,
+            count=1
         )
 
         return html
@@ -159,7 +164,10 @@ def download():
             os.rename(file_path, new)
             file_path = new
 
-        threading.Thread(target=lambda: (time.sleep(5), os.remove(file_path)), daemon=True).start()
+        threading.Thread(
+            target=lambda: (time.sleep(5), os.remove(file_path)),
+            daemon=True
+        ).start()
 
         res = send_file(file_path, as_attachment=True, download_name="reel.mp4")
         res.headers['X-Site-URL'] = request.host_url.rstrip('/')
