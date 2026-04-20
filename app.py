@@ -402,36 +402,29 @@ def generate_all_seo_slugs():
 
 ALL_SEO_SLUGS = generate_all_seo_slugs()
 
-# ---------------- SEO INJECTION (SAFE WITH FALLBACKS) ----------------
+# ---------------- SEO INJECTION (SAFE WITH FALLBACKS) --------------
 @lru_cache(maxsize=100)
 def inject_seo_cached(html, slug):
     try:
         seo = get_seo_for_slug(slug)
         canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
 
-       # Inject SEO data for frontend (SAFE - no duplication)
-script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
+        # Inject SEO data for frontend
+        script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
 
-if "window.SERVER_SEO" not in html and "</head>" in html:
-    html = html.replace("</head>", script + "\n</head>")
+        if "window.SERVER_SEO" not in html and "</head>" in html:
+            html = html.replace("</head>", script + "\n</head>")
 
-        # Safe title replacement with regex
+        # Safe title replacement
         try:
             html = re.sub(r"<title>.*?</title>", f"<title>{seo['title']}</title>", html, count=1)
         except Exception:
             pass
 
-        # Safe canonical replacement
-        try:
-            html = re.sub(r'<link rel="canonical".*?>', f'<link rel="canonical" href="{canonical}" />', html, count=1)
-        except Exception:
-            pass
-
-        return html
     except Exception as e:
-        logger.error(f"SEO injection error: {e}")
-        return html
+        logger.error(f"SEO error: {e}")
 
+    return html
 # ---------------- ROUTES ----------------
 
 @app.route('/')
