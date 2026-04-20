@@ -954,24 +954,52 @@ async function handleDownload() {
   downloadBtn.disabled = true;
 
   // Track attempt
+  try {
+  // Track attempt
   trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
 
-  try {
-    const res = await fetch('/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
-    });
+  const res = await fetch('/download', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ url })
+  });
 
-    progressBar.style.width = "70%";
+  if (!res.ok) {
+    throw new Error("Server error");
+  }
 
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Download failed');
-    }
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('video')) {
+    const text = await res.text();
+    throw new Error(text || "Invalid file response");
+  }
 
-    const blob = await res.blob();
+  const blob = await res.blob();
 
+  progressBar.style.width = "100%";
+
+  const objectUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = objectUrl;
+  a.download = "reelsnag_" + Date.now() + ".mp4";
+
+  document.body.appendChild(a);
+  a.click();
+
+  // ✅ CLEANUP (VERY IMPORTANT)
+  URL.revokeObjectURL(objectUrl);
+  a.remove();
+
+} catch (err) {
+  console.error(err);
+  alert(err.message || "Download failed");
+} finally {
+  // ✅ RESET UI
+  downloadBtn.classList.remove('loading');
+  downloadBtn.disabled = false;
+}
     progressBar.style.width = "90%";
 
     // Trigger download immediately (preserves user gesture chain)
