@@ -402,35 +402,36 @@ def generate_all_seo_slugs():
 
 ALL_SEO_SLUGS = generate_all_seo_slugs()
 
-       # Inject SEO data for frontend (SAFE - no duplication)
+# ---------------- SEO INJECTION (SAFE WITH FALLBACKS) ----------------
 @lru_cache(maxsize=100)
 def inject_seo_cached(html, slug):
     try:
         seo = get_seo_for_slug(slug)
         canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
 
-        # 🔥 YOUR FIX GOES HERE (INSIDE TRY)
-        script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
+       # Inject SEO data for frontend (SAFE - no duplication)
+script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
 
-        if "window.SERVER_SEO" not in html and "</head>" in html:
-            html = html.replace("</head>", script + "\n</head>")
+if "window.SERVER_SEO" not in html and "</head>" in html:
+    html = html.replace("</head>", script + "\n</head>")
 
-        # other SEO replacements...
+        # Safe title replacement with regex
         try:
             html = re.sub(r"<title>.*?</title>", f"<title>{seo['title']}</title>", html, count=1)
-        except:
+        except Exception:
             pass
 
+        # Safe canonical replacement
         try:
             html = re.sub(r'<link rel="canonical".*?>', f'<link rel="canonical" href="{canonical}" />', html, count=1)
-        except:
+        except Exception:
             pass
 
         return html
-
     except Exception as e:
         logger.error(f"SEO injection error: {e}")
         return html
+
 # ---------------- ROUTES ----------------
 
 @app.route('/')
@@ -476,45 +477,13 @@ Sitemap: https://reelsnag.site/sitemap.xml
 """
     return Response(content, mimetype='text/plain')
 
-@app.route('/privacy-policy')
-def privacy():
-    return """
-    <h1>Privacy Policy</h1>
-    <p>ReelSnag does not store personal data. We may collect anonymous usage data to improve the service.</p>
-    <p>We use cookies and analytics tools to understand user behavior.</p>
-    <p>By using this website, you agree to this policy.</p>
-    """
-
-@app.route('/terms')
-def terms():
-    return """
-    <h1>Terms & Conditions</h1>
-    <p>This tool is provided for personal use only.</p>
-    <p>Users are responsible for ensuring they have rights to download content.</p>
-    <p>ReelSnag is not responsible for misuse of this tool.</p>
-    """
-
-@app.route('/about')
-def about():
-    return """
-    <h1>About ReelSnag</h1>
-    <p>ReelSnag is a free tool to download Instagram reels without watermark in HD quality.</p>
-    <p>It is fast, secure, and works on all devices.</p>
-    """
-
-@app.route('/contact')
-def contact():
-    return """
-    <h1>Contact</h1>
-    <p>For inquiries, contact: reelsnag.site@email.com</p>
-    """
-
 # ---------------- TRACK ENDPOINT (ENHANCED) ----------------
 @app.route('/track', methods=['POST'])
 def track():
     try:
         data = request.get_json(force=True, silent=True) or {}
 
+        # Get additional data from request
         user_agent = request.headers.get('User-Agent', 'unknown')
         referrer = request.headers.get('Referer', 'direct')
         device_type = get_device_type(user_agent)
@@ -532,35 +501,32 @@ def track():
             'extra': data.get('extra', {})
         }
 
+        # Load, update, save
         tracking = load_tracking_data()
-
-        if not isinstance(tracking.get('page_views'), dict):
-            tracking['page_views'] = {}
-
-        if not isinstance(tracking.get('events'), list):
-            tracking['events'] = []
-
-        if not isinstance(tracking.get('downloads'), int):
-            tracking['downloads'] = 0
-
         tracking['events'].append(track_data)
 
-        if track_data['event'] == 'pageview':
-            page = track_data['page']
-            if page not in tracking['page_views']:
-                tracking['page_views'][page] = 0
-            tracking['page_views'][page] += 1
+        # Keep only last 10000 events
+        if len(tracking['events']) > 10000:
+            tracking['events'] = tracking['events'][-10000:]
 
+        # Track page views
+        page = track_data['page']
+        if page not in tracking['page_views']:
+            tracking['page_views'][page] = 0
+        tracking['page_views'][page] += 1
+
+        # Track downloads
         if track_data['event'] == 'download_success':
-            tracking['downloads'] += 1
+            tracking['downloads'] = tracking.get('downloads', 0) + 1
 
         save_tracking_data(tracking)
 
+        logger.info(f"TRACK: {track_data['event']} on {track_data['page']}")
         return jsonify({"ok": True})
-
     except Exception as e:
         logger.error(f"Track error: {e}")
         return jsonify({"ok": True})
+
 # ---------------- STATS ENDPOINT ----------------
 @app.route('/stats')
 def stats():
@@ -592,13 +558,13 @@ def stats():
 
     return jsonify(stats_data)
 
-# ---------------- DOWNLOAD ---------------
+# ---------------- DOWNLOAD ----------------
 @app.route('/download', methods=['POST'])
 def download():
     ip = request.remote_addr or "unknown"
 
     if not check_rate_limit(ip):
-        return jsonify({"error": "Too many requests. Please wait."}), 429
+        return jsonify({"error": "Too many requests. Please wait a moment."}), 429
 
     try:
         data = request.get_json(silent=True) or {}
@@ -609,34 +575,61 @@ def download():
 
         tmp_dir = "/tmp/reelsnag" if os.name != 'nt' else os.path.join(os.environ.get('TEMP', '.'), 'reelsnag')
         os.makedirs(tmp_dir, exist_ok=True)
-
         file_id = str(uuid.uuid4())
         path = os.path.join(tmp_dir, file_id)
 
+        # Optimized yt-dlp options for faster extraction
         ydl_opts = {
-    'outtmpl': path + '.%(ext)s',
-    'quiet': True,
-    'no_warnings': True,
-    'format': 'best[ext=mp4]/best',
-    'noplaylist': True,
-    'cookiefile': 'cookies.txt',  # 🔥 ADD THIS
-}
+            'outtmpl': path + '.%(ext)s',
+            'quiet': True,
+            'no_warnings': True,
+            'extract_flat': False,
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'merge_output_format': 'mp4',
+            'socket_timeout': 30,
+            'retries': 2,
+            'fragment_retries': 2,
+            'http_chunk_size': 10485760,  # 10MB chunks
+        }
 
-       
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             file_path = ydl.prepare_filename(info)
 
-        return send_file(
+        # Ensure .mp4 extension
+        if not file_path.endswith(".mp4"):
+            new_path = file_path.rsplit('.', 1)[0] + ".mp4"
+            if os.path.exists(file_path):
+                os.rename(file_path, new_path)
+                file_path = new_path
+
+        # Schedule cleanup
+        def cleanup():
+            time.sleep(300)  # 5 minutes
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                logger.error(f"Cleanup error: {e}")
+
+        threading.Thread(target=cleanup, daemon=True).start()
+
+        # Build response with explicit headers to prevent browser popup
+        res = send_file(
             file_path,
             as_attachment=True,
             download_name="reelsnag_download.mp4",
             mimetype="video/mp4"
         )
+        res.headers['Content-Disposition'] = 'attachment; filename="reelsnag_download.mp4"'
+        res.headers['X-Content-Type-Options'] = 'nosniff'
+        res.headers['X-Site-URL'] = request.host_url.rstrip('/')
+        return res
 
     except Exception as e:
         logger.error(f"Download error: {e}")
-        return jsonify({"error": "Download failed"}), 500
+        return jsonify({"error": "Download failed. Please check the URL and try again."}), 500
+
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, threaded=True)
