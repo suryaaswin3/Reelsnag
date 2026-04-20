@@ -402,13 +402,6 @@ def generate_all_seo_slugs():
 
 ALL_SEO_SLUGS = generate_all_seo_slugs()
 
-# ---------------- SEO INJECTION (SAFE WITH FALLBACKS) ----------------
-@lru_cache(maxsize=100)
-def inject_seo_cached(html, slug):
-    try:
-        seo = get_seo_for_slug(slug)
-        canonical = "https://reelsnag.site/" if slug == "" else f"https://reelsnag.site/{slug}"
-
        # Inject SEO data for frontend (SAFE - no duplication)
 @lru_cache(maxsize=100)
 def inject_seo_cached(html, slug):
