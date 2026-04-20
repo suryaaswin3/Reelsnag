@@ -6,6 +6,109 @@
 
   <title>Download Instagram Reels Without Watermark (Free) | ReelSnag</title>
 
+  <meta name="description" content="Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader. Paste link and download instantly with ReelSnag.">
+
+  <!-- 🔥 NEW SEO BOOST -->
+  <link rel="canonical" href="https://reelsnag.site/" />
+  <meta name="robots" content="index, follow">
+
+  <!-- 🔥 Open Graph -->
+  <meta property="og:title" content="Download Instagram Reels Without Watermark | ReelSnag">
+  <meta property="og:description" content="Free Instagram reel downloader in HD. No watermark, fast and secure.">
+  <meta property="og:url" content="https://reelsnag.site/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://reelsnag.site/preview.png">
+
+  <!-- 🔥 Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Instagram Reel Downloader | ReelSnag">
+  <meta name="twitter:description" content="Download reels without watermark instantly.">
+
+  <!-- 🔥 SERVER SEO BRIDGE -->
+  <script>
+    window.SERVER_SEO = window.SERVER_SEO || null;
+  </script>
+
+  <!-- 🔥 WebApp Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ReelSnag",
+    "url": "https://reelsnag.site",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "All",
+    "description": "Free Instagram reel downloader without watermark.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+  }
+  </script>
+
+  <!-- 🔥 FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+      "@type": "Question",
+      "name": "How to download Instagram reels?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your reel link into ReelSnag and download instantly."
+      }
+    }]
+  }
+  </script>
+
+  <!-- 🔥 Dynamic SEO (UPGRADED SAFE VERSION) -->
+  <script>
+  (function() {
+    const path = window.location.pathname;
+
+    let config = window.SERVER_SEO || {
+      title: "Download Instagram Reels Without Watermark (Free) | ReelSnag",
+      heading: "Download Instagram Reels",
+      subtitle: "Paste your reel link and download instantly",
+      content: "ReelSnag is a free Instagram reel downloader that allows users to download reels without watermark in HD quality. Works instantly on all devices."
+    };
+
+    if (!window.SERVER_SEO) {
+      if (path.includes("instagram-reel-downloader")) {
+        config = {
+          title: "Instagram Reel Downloader Without Watermark HD | ReelSnag",
+          heading: "Instagram Reel Downloader",
+          subtitle: "Download reels without watermark in HD",
+          content: "Download Instagram reels without watermark in HD quality using ReelSnag. Fast and free tool."
+        };
+      }
+
+      if (path.includes("download-instagram-reels")) {
+        config = {
+          title: "Download Instagram Reels Free HD | ReelSnag",
+          heading: "Download Instagram Reels",
+          subtitle: "Free HD reel downloader online",
+          content: "Download Instagram reels free in HD with no watermark using ReelSnag."
+        };
+      }
+
+      if (path.includes("reels-downloader")) {
+        config = {
+          title: "Best Reels Downloader Online | ReelSnag",
+          heading: "Reels Downloader",
+          subtitle: "Fast and free reel downloader",
+          content: "Best reels downloader to save Instagram videos instantly without watermark."
+        };
+      }
+    }
+
+    if (!document.title || document.title.includes("ReelSnag")) {
+      document.title = config.title;
+    }
+
+    window.dynamicSEO = config;
+  })();
+  </script>
+
+  <!-- ✅ ORIGINAL GOOGLE ANALYTICS -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FXNM54KLMJ"></script>
   <script>
   window.dataLayer = window.dataLayer || [];
@@ -16,6 +119,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 
+  <!-- 🔥 YOUR STYLE BLOCK (UNCHANGED) -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -38,6 +142,7 @@
       justify-content: center;
       align-items: center;
       padding: 2rem 1rem;
+      flex-direction: column;
     }
 
     .container {
@@ -141,7 +246,8 @@
   </div>
 
   <div class="card">
-    <h1>Download Instagram Reels</h1>
+    <h1 id="mainHeading">Download Instagram Reels</h1>
+    <p class="subtitle" id="subHeading">Paste your reel link and download instantly</p>
 
     <input id="urlInput" type="url" placeholder="Paste Instagram reel link here..."/>
 
@@ -155,29 +261,84 @@
         <div class="progress-bar" id="progressBar"></div>
       </div>
     </div>
-
   </div>
 
 </div>
 
+<div id="seoContent" style="max-width:560px;margin-top:40px;font-size:13px;color:#5a5a72;"></div>
+
+<script>
+window.onload = function() {
+  const lastUrl = localStorage.getItem("lastReelUrl");
+  if (lastUrl) document.getElementById("urlInput").value = lastUrl;
+
+  if (window.dynamicSEO) {
+    document.getElementById("mainHeading").innerText = dynamicSEO.heading;
+    document.getElementById("subHeading").innerText = dynamicSEO.subtitle;
+
+    document.getElementById("seoContent").innerHTML = `
+      <h2>${dynamicSEO.heading}</h2>
+      <p>${dynamicSEO.content}</p>
+
+      <h3>How to download Instagram reels?</h3>
+      <p>Copy the Instagram reel link, paste it above, and click download. ReelSnag will instantly generate your video without watermark.</p>
+
+      <h3>Why choose ReelSnag?</h3>
+      <ul>
+        <li>Download reels in HD quality</li>
+        <li>No watermark</li>
+        <li>Fast processing</li>
+        <li>Works on all devices</li>
+      </ul>
+    `;
+  }
+};
+</script>
+
 <script>
 async function handleDownload() {
+  const urlInput = document.getElementById("urlInput");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const status = document.getElementById("status");
+  const statusText = document.getElementById("statusText");
+  const progressBar = document.getElementById("progressBar");
+
   const url = urlInput.value.trim();
   if (!url) return;
+
+  localStorage.setItem("lastReelUrl", url);
+
+  status.classList.add("show");
+  statusText.innerText = "Preparing...";
+  progressBar.style.width = "30%";
 
   downloadBtn.innerText = "Downloading...";
   downloadBtn.disabled = true;
 
+  fetch('/track',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      url,
+      page: window.location.pathname
+    })
+  }).catch(()=>{});
+
   try {
-    const res = await fetch('/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
+    const res = await fetch('/download',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url})
     });
 
-    if (!res.ok) throw new Error();
+    progressBar.style.width = "70%";
 
+    const siteUrl = res.headers.get('X-Site-URL') || window.location.origin;
     const blob = await res.blob();
+
+    await new Promise(r => setTimeout(r, 1000));
+
+    progressBar.style.width = "100%";
 
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -192,17 +353,29 @@ async function handleDownload() {
       a.remove();
     }, 1500);
 
+    if (navigator.share) {
+      navigator.share({ title:"ReelSnag", url:siteUrl }).catch(()=>{});
+    }
+
     downloadBtn.innerText = "Downloaded!";
+    statusText.innerText = "Downloaded!";
   } catch {
     downloadBtn.innerText = "Error";
+    statusText.innerText = "Error";
   }
 
   setTimeout(() => {
     downloadBtn.innerText = "Download Now (HD, No Watermark)";
     downloadBtn.disabled = false;
+    progressBar.style.width = "0%";
+    status.classList.remove("show");
   }, 2000);
 }
 </script>
+
+<div style="display:none;">
+instagram reel downloader, download reels without watermark, reels downloader hd, instagram video download tool
+</div>
 
 </body>
 </html>
