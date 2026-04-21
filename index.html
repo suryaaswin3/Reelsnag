@@ -884,18 +884,23 @@ function generateSeoContent() {
 }
 
 // Paste from clipboard
-function pasteFromClipboard() {
-  navigator.clipboard.readText().then(text => {
-    const input = document.getElementById('urlInput');
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    const input = document.getElementById("urlInput");
+
     input.value = text.trim();
-    input.classList.add('success');
-    setTimeout(() => input.classList.remove('success'), 1000);
-  }).catch(() => {
+
+    // force visual refresh
+    input.focus();
+    input.dispatchEvent(new Event('input'));
+
+  } catch (err) {
     const text = prompt('Paste your Instagram reel link:');
     if (text) {
-      document.getElementById('urlInput').value = text.trim();
+      document.getElementById("urlInput").value = text.trim();
     }
-  });
+  }
 }
 
 // Validate Instagram URL
@@ -959,27 +964,33 @@ async function handleDownload() {
 
     if (!res.ok) throw new Error("Server error");
 
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('video')) {
-      const text = await res.text();
-      throw new Error(text || "Invalid response");
+    const blob = await res.blob();
+
+    if (!blob || blob.size === 0) {
+      throw new Error("Empty video received");
     }
 
-    const blob = await res.blob();
     progressBar.style.width = "100%";
 
-    const objectUrl = URL.createObjectURL(blob);
+    // 🔥 ALWAYS create fresh URL
+    const objectUrl = window.URL.createObjectURL(blob);
+
     const a = document.createElement('a');
     a.href = objectUrl;
     a.download = "reelsnag_" + Date.now() + ".mp4";
-
     document.body.appendChild(a);
     a.click();
 
-    URL.revokeObjectURL(objectUrl);
-    a.remove();
+    // 🔥 CLEANUP AFTER DOWNLOAD (IMPORTANT)
+    setTimeout(() => {
+      window.URL.revokeObjectURL(objectUrl);
+      a.remove();
+    }, 1000);
 
     statusText.innerText = "Download complete";
+
+    // 🔥 RESET INPUT (YOU WERE MISSING THIS)
+    urlInput.value = "";
 
   } catch (err) {
     statusText.innerText = err.message;
