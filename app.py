@@ -111,9 +111,13 @@ def check_rate_limit(ip):
 
 from flask import send_from_directory
 
-@app.route('/')
+@app.route("/")
 def home():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(".", "index.html")
+
+@app.route("/<path:slug>")
+def seo_pages(slug):
+    return send_from_directory(".", "index.html")
 # ---------------- DOWNLOAD ----------------
 @app.route('/download', methods=['POST'])
 def download():
