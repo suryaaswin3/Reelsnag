@@ -688,23 +688,9 @@ window.onload = function() {
     generateRelatedPages();
 
     // Generate SEO content sections
-   generateSeoContent();
-
-// Track page view
-window.trackEvent = function(event, page, extra = {}) {
-  fetch('/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event,
-      page: page || window.location.pathname,
-      path: window.location.pathname,
-      timestamp: Date.now(),
-      referrer: document.referrer || 'direct',
-      ...extra
-    })
-  }).catch(() => {});
-};
+    generateSeoContent();
+      }
+    };
 
 // Generate breadcrumb
 function generateBreadcrumb() {
@@ -956,6 +942,21 @@ window.trackEvent = function(event, page, extra = {}) {
 }
 
 // Main download handler
+  window.trackEvent = function(event, page, extra = {}) {
+  fetch('/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: page || window.location.pathname,
+      path: window.location.pathname,
+      timestamp: Date.now(),
+      referrer: document.referrer || 'direct',
+      ...extra
+    })
+  }).catch(() => {});
+};
+  
 async function handleDownload() {
   const urlInput = document.getElementById("urlInput");
   const downloadBtn = document.getElementById("downloadBtn");
