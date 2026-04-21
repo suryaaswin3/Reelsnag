@@ -20,7 +20,6 @@ gtag('config', 'AW-18095042931');
 
   <meta name="description" content="Download Instagram reels without watermark in HD quality. Free, fast and secure Instagram reel downloader. Paste link and download instantly with ReelSnag.">
 
-  
   <!-- SEO -->
   <link rel="canonical" href="https://reelsnag.site/" />
   <meta name="robots" content="index, follow">
@@ -585,34 +584,27 @@ gtag('config', 'AW-18095042931');
 
 <!-- SEO Content Anchor -->
 <div id="seoContentWrapper" class="seo-content-wrapper">
-  <!-- STATIC SEO FALLBACK (CRITICAL FOR GOOGLE) -->
-<noscript>
+
+  <div id="popularPages"></div>
+
+  <div id="seoContent">
+
   <div class="seo-sections">
     <h3>Download Instagram Reels Without Watermark</h3>
     <p>
       ReelSnag allows you to download Instagram reels in HD quality without watermark.
-      Fast, free and works on all devices including Android, iPhone and PC.
+      Fast, free and works on all devices.
     </p>
-
-    <h3>How to Download Instagram Reels</h3>
-    <ol>
-      <li>Copy the Instagram reel link</li>
-      <li>Paste it into the input box</li>
-      <li>Click download</li>
-      <li>Save the video instantly</li>
-    </ol>
   </div>
 
   <div class="faq-section">
     <h2>FAQ</h2>
-    <p><strong>Is it free?</strong> Yes, completely free.</p>
-    <p><strong>Watermark?</strong> No watermark included.</p>
-    <p><strong>Devices?</strong> Works on all devices.</p>
+    <p>Yes, it's completely free and works instantly.</p>
   </div>
-</noscript>
-  <div id="popularPages"></div>
-  <div id="seoContent"></div>
+
+</div>
   <div id="relatedPages"></div>
+
 </div>
 
 <!-- Hidden SEO Keywords -->
@@ -938,7 +930,6 @@ function trackEvent(event, page, extra = {}) {
   }).catch(() => {});
 }
 
-<script>
 // Main download handler
 async function handleDownload() {
   const urlInput = document.getElementById("urlInput");
@@ -954,40 +945,12 @@ async function handleDownload() {
     return;
   }
 
-  // ✅ VALIDATION (kept your logic)
-  if (!isValidInstagramUrl(url)) {
-    urlInput.classList.add('error');
-    status.classList.add("show");
-    statusText.innerText = "Please enter a valid Instagram reel URL";
-    statusText.classList.add('error');
-
-    setTimeout(() => {
-      urlInput.classList.remove('error');
-      statusText.classList.remove('error');
-    }, 3000);
-
-    trackEvent('download_error', window.location.pathname, { reason: 'invalid_url' });
-    return;
-  }
-
-  // UI state
-  urlInput.classList.remove('error');
-  urlInput.classList.add('success');
-  setTimeout(() => urlInput.classList.remove('success'), 1000);
-
-  localStorage.setItem("lastReelUrl", url);
-
   downloadBtn.disabled = true;
-  downloadBtn.innerText = "Processing...";
-
   status.classList.add("show");
   statusText.innerText = "Processing...";
-  statusText.classList.remove('error', 'success');
   progressBar.style.width = "30%";
 
   try {
-    trackEvent('download_attempt', window.location.pathname, { url_length: url.length });
-
     const res = await fetch('/download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -999,7 +962,7 @@ async function handleDownload() {
     const contentType = res.headers.get('content-type') || '';
     if (!contentType.includes('video')) {
       const text = await res.text();
-      throw new Error(text || "Invalid file response");
+      throw new Error(text || "Invalid response");
     }
 
     const blob = await res.blob();
@@ -1013,38 +976,16 @@ async function handleDownload() {
     document.body.appendChild(a);
     a.click();
 
-    // ✅ CLEANUP (fixes 3rd time bug)
     URL.revokeObjectURL(objectUrl);
     a.remove();
 
-    // Success
-    statusText.innerText = "Download complete!";
-    if (typeof gtag === 'function') {
-      
-  gtag('event', 'conversion', {
-    'send_to': 'AW-18095042931/IY3NCPONjp0cEPPisbRD'
-  });
-}
-    statusText.classList.add('success');
-    downloadBtn.innerText = "Downloaded!";
-
-    trackEvent('download_success', window.location.pathname);
+    statusText.innerText = "Download complete";
 
   } catch (err) {
-    statusText.innerText = err.message || "Download failed";
-    statusText.classList.add('error');
-    downloadBtn.innerText = "Try Again";
-
-    trackEvent('download_error', window.location.pathname, { reason: err.message });
-
+    statusText.innerText = err.message;
   } finally {
-    setTimeout(() => {
-      downloadBtn.innerText = "Download Now (HD, No Watermark)";
-      downloadBtn.disabled = false;
-      progressBar.style.width = "0%";
-      status.classList.remove("show");
-      statusText.classList.remove('success', 'error');
-    }, 2000);
+    downloadBtn.disabled = false;
+    progressBar.style.width = "0%";
   }
 }
 </script>
