@@ -807,7 +807,8 @@ function generateSeoContent() {
     `;
   }
 
-  contentDiv.innerHTML = `
+  if (!contentDiv.innerHTML.trim()) {
+    contentDiv.innerHTML = `
     <div class="seo-sections">
       <h3>How to ${heading}</h3>
       <ol>
@@ -885,15 +886,18 @@ function generateSeoContent() {
 
 // Paste from clipboard
 async function pasteFromClipboard() {
+  const input = document.getElementById("urlInput");
+
   try {
     const text = await navigator.clipboard.readText();
-    const input = document.getElementById("urlInput");
-
     input.value = text.trim();
+  } catch {
+    const fallback = prompt("Paste your Instagram reel link:");
+    if (fallback) input.value = fallback.trim();
+  }
 
-    // force visual refresh
-    input.focus();
-    input.dispatchEvent(new Event('input'));
+  input.focus();
+}
 
   } catch (err) {
     const text = prompt('Paste your Instagram reel link:');
@@ -943,12 +947,17 @@ async function handleDownload() {
   const statusText = document.getElementById("statusText");
   const progressBar = document.getElementById("progressBar");
 
-  const url = urlInput.value.trim();
+ const url = urlInput.value.trim();
 
-  if (!url) {
-    alert("Paste a URL");
-    return;
-  }
+if (!url) {
+  alert("Paste a URL");
+  return;
+}
+
+if (!isValidInstagramUrl(url)) {
+  alert("Enter a valid Instagram reel URL");
+  return;
+}
 
   downloadBtn.disabled = true;
   status.classList.add("show");
@@ -988,10 +997,11 @@ async function handleDownload() {
     }, 1000);
 
     statusText.innerText = "Download complete";
-
-    // 🔥 RESET INPUT (YOU WERE MISSING THIS)
+    
+// ✅ CLEAN RESET (ADD THIS HERE)
     urlInput.value = "";
-
+    localStorage.setItem("lastReelUrl", "");
+    
   } catch (err) {
     statusText.innerText = err.message;
   } finally {
