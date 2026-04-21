@@ -926,37 +926,29 @@ function isValidInstagramUrl(url) {
 }
 
 // Track events with enhanced data
-window.trackEvent = function(event, page, extra = {}) {
-  fetch('/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event,
-      page: page || window.location.pathname,
-      path: window.location.pathname,
-      timestamp: Date.now(),
-      referrer: document.referrer || 'direct',
-      ...extra
-    })
-  }).catch(() => {});
-}
+window.trackEvent = async function(event, page, extra = {}) {
+  try {
+    await fetch('/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event,
+        page: page || window.location.pathname,
+        path: window.location.pathname,
+        timestamp: Date.now(),
+        referrer: document.referrer || 'direct',
+        ...extra
+      })
+    });
+  } catch (err) {
+    console.error("Tracking failed:", err);
+  }
+};
 
 // Main download handler
-  window.trackEvent = function(event, page, extra = {}) {
-  fetch('/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event,
-      page: page || window.location.pathname,
-      path: window.location.pathname,
-      timestamp: Date.now(),
-      referrer: document.referrer || 'direct',
-      ...extra
-    })
-  }).catch(() => {});
-};
-  
+  await trackEvent('download', window.location.pathname, {
+  reelUrl: urlInput.value
+});
 async function handleDownload() {
   const urlInput = document.getElementById("urlInput");
   const downloadBtn = document.getElementById("downloadBtn");
@@ -1014,8 +1006,15 @@ if (!isValidInstagramUrl(url)) {
     }, 1000);
 
     statusText.innerText = "Download complete";
-    trackEvent('download', window.location.pathname, {
-  reelUrl: urlInput.value
+    await fetch('/track', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    event: 'download',
+    reelUrl: urlInput.value,
+    page: window.location.pathname,
+    referrer: document.referrer || 'direct'
+  })
 });
     
 // ✅ CLEAN RESET (ADD THIS HERE)
