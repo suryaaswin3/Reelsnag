@@ -929,7 +929,7 @@ function isValidInstagramUrl(url) {
 }
 
 // Track events with enhanced data
-function trackEvent(event, page, extra = {}) {
+window.trackEvent = function(event, page, extra = {}) {
   fetch('/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
