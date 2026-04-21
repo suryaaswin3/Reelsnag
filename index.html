@@ -946,9 +946,6 @@ window.trackEvent = async function(event, page, extra = {}) {
 };
 
 // Main download handler
-  await trackEvent('download', window.location.pathname, {
-  reelUrl: urlInput.value
-});
 async function handleDownload() {
   const urlInput = document.getElementById("urlInput");
   const downloadBtn = document.getElementById("downloadBtn");
