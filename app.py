@@ -109,7 +109,11 @@ def check_rate_limit(ip):
         data['count'] += 1
         return True
 
+from flask import send_from_directory
 
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 # ---------------- DOWNLOAD ----------------
 @app.route('/download', methods=['POST'])
 def download():
