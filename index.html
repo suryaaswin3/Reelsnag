@@ -1003,15 +1003,8 @@ if (!isValidInstagramUrl(url)) {
     }, 1000);
 
     statusText.innerText = "Download complete";
-    await fetch('/track', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    event: 'download',
-    reelUrl: urlInput.value,
-    page: window.location.pathname,
-    referrer: document.referrer || 'direct'
-  })
+    await trackEvent('download', window.location.pathname, {
+  reelUrl: urlInput.value
 });
     
 // ✅ CLEAN RESET (ADD THIS HERE)
