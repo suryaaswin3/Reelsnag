@@ -688,12 +688,13 @@ window.onload = function() {
     generateRelatedPages();
 
     // Generate SEO content sections
-    generateSeoContent();
+   generateSeoContent();
 
-    // Track page view
-    window.addEventListener('load', () => {
-  trackEvent('pageview', window.location.pathname);
-});
+// Track page view
+trackEvent('pageview', window.location.pathname);
+
+  }   // closes: if (window.dynamicSEO)
+};    // closes: window.onload
 
 // Generate breadcrumb
 function generateBreadcrumb() {
