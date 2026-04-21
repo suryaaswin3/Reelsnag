@@ -114,6 +114,18 @@ from flask import send_from_directory
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
+    
+ @app.route('/stats')
+def stats():
+    return "Stats working"
+
+@app.route('/track', methods=['GET', 'POST'])
+def track():
+    if request.method == 'POST':
+        data = request.json
+        print("Tracking:", data)
+        return {"status": "ok"}
+    return "Track endpoint working"   
 
 @app.route("/<path:slug>")
 def seo_pages(slug):
