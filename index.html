@@ -603,11 +603,6 @@ gtag('config', 'AW-18095042931');
     </p>
   </div>
 
-  <div class="faq-section">
-    <h2>FAQ</h2>
-    <p>Yes, it's completely free and works instantly.</p>
-  </div>
-
 </div>
   <div id="relatedPages"></div>
 
@@ -777,6 +772,7 @@ function generateRelatedPages() {
 function generateSeoContent() {
   const contentDiv = document.getElementById('seoContent');
   if (!contentDiv) return;
+  if (contentDiv.dataset.loaded === 'true') return;
 
   const heading = dynamicSEO.heading || 'Download Instagram Reels';
   const slug = window.currentSlug || '';
@@ -813,8 +809,7 @@ function generateSeoContent() {
     `;
   }
 
-  if (!contentDiv.innerHTML.trim()) {
-    contentDiv.innerHTML = `
+  contentDiv.innerHTML = `
     <div class="seo-sections">
       <h3>How to ${heading}</h3>
       <ol>
@@ -833,6 +828,8 @@ function generateSeoContent() {
         <li><strong>Mac:</strong> macOS 10.14+, Safari/Chrome/Firefox</li>
         <li><strong>Linux:</strong> All distributions with modern browsers</li>
       </ul>
+
+      ${deviceText}
 
       ${qualityText}
 
@@ -888,7 +885,8 @@ function generateSeoContent() {
       </div>
     </div>
   `;
-}
+  contentDiv.dataset.loaded = 'true';
+} // end generateSeoContent
 
 // Paste from clipboard
 async function pasteFromClipboard() {
@@ -903,14 +901,6 @@ async function pasteFromClipboard() {
   }
 
   input.focus();
-}
-
-  } catch (err) {
-    const text = prompt('Paste your Instagram reel link:');
-    if (text) {
-      document.getElementById("urlInput").value = text.trim();
-    }
-  }
 }
 
 // Validate Instagram URL
