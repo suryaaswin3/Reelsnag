@@ -117,17 +117,23 @@ def home():
 
 import json
 from datetime import datetime
+from flask import request, jsonify
 
 @app.route('/track', methods=['POST'])
 def track():
     try:
         data = request.json or {}
 
+        event = data.get("event")
+        url = data.get("reelUrl") or data.get("url")
+
         entry = {
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "ip": request.remote_addr,
-            "event": data.get("event", "unknown"),
-            "url": data.get("url", "")
+            "event": event,
+            "url": url,
+            "page": data.get("page"),
+            "referrer": data.get("referrer")
         }
 
         # Load existing data
@@ -143,10 +149,10 @@ def track():
         with open("tracking_data.json", "w") as f:
             json.dump(logs, f, indent=2)
 
-        return {"status": "saved"}
+        return jsonify({"status": "saved"})
 
     except Exception as e:
-        return {"error": str(e)}, 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/stats')
 def stats():
