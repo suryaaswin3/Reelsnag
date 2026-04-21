@@ -1002,6 +1002,9 @@ if (!isValidInstagramUrl(url)) {
     }, 1000);
 
     statusText.innerText = "Download complete";
+    trackEvent('download', window.location.pathname, {
+  reelUrl: urlInput.value
+});
     
 // ✅ CLEAN RESET (ADD THIS HERE)
     urlInput.value = "";
