@@ -183,16 +183,16 @@ gtag('config', 'AW-18095042931');
       --error: #f87171;
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem 1rem;
-      flex-direction: column;
+   body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;  /* ✅ FIX */
+    padding: 2rem 1rem;
     }
 
     .container {
@@ -362,7 +362,7 @@ gtag('config', 'AW-18095042931');
     /* SEO Content Sections */
     .seo-content-wrapper {
       max-width: 560px;
-      margin-top: 40px;
+      margin-top: 15px;
       padding: 0 1rem;
     }
 
@@ -524,7 +524,7 @@ gtag('config', 'AW-18095042931');
     .breadcrumb {
       max-width: 560px;
       padding: 0 1rem;
-      margin-top: 1rem;
+      margin-top: 8px;
       font-size: 0.8rem;
       color: var(--muted);
     }
@@ -1037,13 +1037,11 @@ window.addEventListener("load", function () {
   const ads = document.querySelectorAll(".adsbygoogle");
 
   ads.forEach((ad, index) => {
-    setTimeout(() => {
-      try {
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        console.log("Ad error:", e);
-      }
-    }, index * 800);
+    try {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.log("Ad error:", e);
+    }
   });
 });
 </script>
