@@ -413,7 +413,7 @@ def inject_seo_cached(html, slug):
         script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
 
         if "</head>" in html:
-    html = html.replace("</head>", script + "\n</head>")
+            html = html.replace("</head>", script + "\n</head>")
 
         # Safe title replacement
         try:
