@@ -691,9 +691,9 @@ window.onload = function() {
     generateSeoContent();
 
     // Track page view
-    trackEvent('pageview', window.location.pathname);
-  }
-};
+    window.addEventListener('load', () => {
+  trackEvent('pageview', window.location.pathname);
+});
 
 // Generate breadcrumb
 function generateBreadcrumb() {
