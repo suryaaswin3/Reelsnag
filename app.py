@@ -412,8 +412,8 @@ def inject_seo_cached(html, slug):
         # Inject SEO data for frontend
         script = f'<script>window.SERVER_SEO={json.dumps(seo)}</script>'
 
-        if "window.SERVER_SEO" not in html and "</head>" in html:
-            html = html.replace("</head>", script + "\n</head>")
+        if "</head>" in html:
+    html = html.replace("</head>", script + "\n</head>")
 
         # Safe title replacement
         try:
