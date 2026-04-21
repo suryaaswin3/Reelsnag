@@ -154,6 +154,8 @@ def track():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+import json
+
 @app.route('/stats')
 def stats():
     try:
@@ -163,17 +165,16 @@ def stats():
         logs = []
 
     total = len(logs)
-
-    # Count downloads
     downloads = sum(1 for l in logs if l.get("event") == "download")
 
     return f"""
     <h1>ReelSnag Stats</h1>
     <p>Total Events: {total}</p>
     <p>Total Downloads: {downloads}</p>
+    <h3>Recent Logs:</h3>
     <pre>{json.dumps(logs[-10:], indent=2)}</pre>
     """
-
+    
 @app.route("/<path:slug>")
 def seo_pages(slug):
     return send_from_directory(".", "index.html")
