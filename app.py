@@ -114,18 +114,59 @@ from flask import send_from_directory
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
-    
- @app.route('/stats')
-def stats():
-    return "Stats working"
 
-@app.route('/track', methods=['GET', 'POST'])
+import json
+from datetime import datetime
+
+@app.route('/track', methods=['POST'])
 def track():
-    if request.method == 'POST':
-        data = request.json
-        print("Tracking:", data)
-        return {"status": "ok"}
-    return "Track endpoint working"   
+    try:
+        data = request.json or {}
+
+        entry = {
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "ip": request.remote_addr,
+            "event": data.get("event", "unknown"),
+            "url": data.get("url", "")
+        }
+
+        # Load existing data
+        try:
+            with open("tracking_data.json", "r") as f:
+                logs = json.load(f)
+        except:
+            logs = []
+
+        logs.append(entry)
+
+        # Save back
+        with open("tracking_data.json", "w") as f:
+            json.dump(logs, f, indent=2)
+
+        return {"status": "saved"}
+
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+@app.route('/stats')
+def stats():
+    try:
+        with open("tracking_data.json", "r") as f:
+            logs = json.load(f)
+    except:
+        logs = []
+
+    total = len(logs)
+
+    # Count downloads
+    downloads = sum(1 for l in logs if l.get("event") == "download")
+
+    return f"""
+    <h1>ReelSnag Stats</h1>
+    <p>Total Events: {total}</p>
+    <p>Total Downloads: {downloads}</p>
+    <pre>{json.dumps(logs[-10:], indent=2)}</pre>
+    """
 
 @app.route("/<path:slug>")
 def seo_pages(slug):
