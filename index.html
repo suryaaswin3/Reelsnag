@@ -691,10 +691,20 @@ window.onload = function() {
    generateSeoContent();
 
 // Track page view
-trackEvent('pageview', window.location.pathname);
-
-  }   // closes: if (window.dynamicSEO)
-};    // closes: window.onload
+window.trackEvent = function(event, page, extra = {}) {
+  fetch('/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      page: page || window.location.pathname,
+      path: window.location.pathname,
+      timestamp: Date.now(),
+      referrer: document.referrer || 'direct',
+      ...extra
+    })
+  }).catch(() => {});
+};
 
 // Generate breadcrumb
 function generateBreadcrumb() {
